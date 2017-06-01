@@ -1,0 +1,25 @@
+{
+    "name": "maxime-dolet/website",
+    "description": "Plateforme de gestion de projet pour les étudiants en architecture de Liège et Nancy",
+    "keywords": ["gestion projet nancy liège étudiant "],
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Maxime Dolet",
+            "email": "maxime.dolet8@etu.univ-lorraine.fr"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "slim/slim": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": { "Foo\\": "src/" }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}

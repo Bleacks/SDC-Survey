@@ -1,0 +1,12 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule .* index.php
+Options -Indexes
+
+
+# TODO: Mettre en place une gestion des erreurs pour chacun des codes ci-dessous
+# ErrorDocument error_num message_ou_destination
+# 401 : Authorization required. Cette erreur est générée lorsqu’un visiteur saisit un mauvais login / mot de passe lors de l’accès à un fichier ou répertoire protégé.
+# 403 : Access denied. L’accès à un répertoire dans lequel aucun fichier index.html (ou index.cgi, etc.) n’est présent et que la configuration du serveur interdit l’affichage des fichiers du répertoire.
+# 404 : Not Found. Le fichier que le visiteur essaie de voir n’existe pas.
+# 500 : Server Error. Typiquement, c’est le cas lorsqu’un CGI ne s’est pas exécuté correctement ou que les droits du script ne sont pas corrects.
