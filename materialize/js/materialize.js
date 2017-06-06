@@ -4319,13 +4319,14 @@ if (jQuery) {
 
       // Setup autocomplete if needed.
       var input = $('#' + chipId);
+      console.log(chipId);
       if (self.hasAutocomplete) {
         curr_options.autocompleteOptions.onAutocomplete = function(val) {
           self.addChip({tag: val}, $chips);
           input.val('');
           input.focus();
         }
-        input.autocomplete(curr_options.autocompleteOptions);
+        //input.autocomplete(curr_options.autocompleteOptions);
       }
     };
 
