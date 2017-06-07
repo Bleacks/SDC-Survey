@@ -14,27 +14,25 @@ class Main
    function __construct()
    {
       // TODO: Revoir l'architecture de la classe
-      // TODO: Gestion centralisée des erreurs pour chaque génération de code
-      if (empty($content))
-      {
-         return 'Error no document created';
-      }
+      // TODO: Gestion hierachisée des erreurs pour factoriser au maximum les constantes
    }
 
    /**
    * Generate header of pages
+   * @return (String):Computed header
    */
-   function header()
+   private function header()
    {
       // TODO: Rediriger les href du header
       return '<header>
   <nav>
     <div class="nav-wrapper">
-      <a href="#" class="brand-logo">Logo</a>
+      <a href="Accueil" class="brand-logo">Logo</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="sass.html">Sass</a></li>
-        <li><a href="badges.html">Components</a></li>
-        <li><a href="collapsible.html">JavaScript</a></li>
+        <li><a href="Home">Home</a></li>
+        <li><a href="Profile/54">Profile</a></li>
+        <li><a href="Messages">Messages</a></li>
+        <li><a href="Settings">Settings</a></li>
       </ul>
     </div>
   </nav>
@@ -43,12 +41,13 @@ class Main
 
    /**
    * Example of Chips usage
+   * @return (String):Computed content
    */
-   function content()
+   private function content()
    {
       // TODO: Séparer les méthodes spécifiques aux pages dans des classes spécifiques
       return
-      '<div class="chips chips-autocomplete" data-index="0" data-initialized="true">
+      '<div class="chips chips-placeholder chips-autocomplete chips-initial" data-index="0" data-initialized="true">
          <input id="e2b78123-5a53-e67d-d60c-8293d451905a" class="input" placeholder="">
          <ul class="autocomplete-content dropdown-content"></ul>
       </div>';
@@ -56,8 +55,9 @@ class Main
 
    /**
    * Generate footer of pages
+   * @return (String):Computed Footer
    */
-   function footer()
+   private function footer()
    {
       // TODO: Ajouter les liens vers les autres pages
       // TODO: Ajouter une description
@@ -90,9 +90,17 @@ class Main
 
    /**
    * Final assembly of page elements
+   * @return (String):Computed page
    */
    function generateHome()
    {
+      if (empty($header = $this->header()))
+         $this->logError("header is empty");
+      if (empty($content = $this->content()))
+         $this->logError("content is empty");
+      if (empty($footer = $this->footer()))
+         $this->logError("footer is empty");
+
       return '<!DOCTYPE html>
          <html>
             <head>
@@ -111,15 +119,33 @@ class Main
             </head>
 
             <body>
-               '. $this->header()
-                . $this->content()
-                . $this->footer() .'
+               '. $header
+                . $content
+                . $footer .'
                <!--Import jQuery before materialize.js-->
-               <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-               <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-               <script type="text/javascript" src="materialize/js/materialize.min.js"></script>
+               <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
+               <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.js"></script>
+               <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
                <script type="text/javascript" src="js/chips.js"></script>
             </body>
          </html>';
+   }
+
+   /**
+   * Send error log to Apache, factoring error context in one method
+   * @param (String)$message : Error message
+   */
+   private function logError($message)
+   {
+      error_log('Error creating Main.php : ' . $message);
+   }
+
+   /**
+   * Returns the work in progress page
+   */
+   public static function workInProgressPage()
+   {
+      // TODO: Pimper la page, voir même utiliser un système de gestion d'erreur pour factoriser
+      return 'Work in progress';
    }
 }

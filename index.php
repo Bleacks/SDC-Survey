@@ -7,7 +7,7 @@ require "vendor/autoload.php";
 use Slim\App;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Src\Main;
+use Src\Main as Main;
 
 $app = new App([
     'settings' => [
@@ -19,17 +19,34 @@ $app = new App([
 
 // TODO: Main ne doit être utilisée que par les classes spécifiques, vers lesquelles Slim redirige
 
-$app->get('/Accueil', function (ServerRequestInterface $request, ResponseInterface $response) {
+$app->get('/Home', function (ServerRequestInterface $request, ResponseInterface $response) {
+   return Main::workInProgressPage();
+});
+
+$app->get('/Demo', function (ServerRequestInterface $request, ResponseInterface $response) {
    $main = new Main();
    return $main->generateHome();
 });
 
 $app->get('/Profile/{num}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-    return 'Profil numéro '.$args['num'];
+    #return 'Profil numéro '.$args['num'];
+    return Main::workInProgressPage();
 });
 
 $app->get('/Messages', function (ServerRequestInterface $request, ResponseInterface $response) {
-    return 'Messages';
+    return Main::workInProgressPage();
+});
+
+$app->get('/Settings', function (ServerRequestInterface $request, ResponseInterface $response) {
+    return Main::workInProgressPage();
+});
+
+$app->get('/Subscribe', function (ServerRequestInterface $request, ResponseInterface $response) {
+    return Main::workInProgressPage();
+});
+
+$app->get('/Login', function (ServerRequestInterface $request, ResponseInterface $response) {
+    return Main::workInProgressPage();
 });
 
 $app->run();
