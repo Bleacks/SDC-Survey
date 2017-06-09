@@ -27,10 +27,10 @@ CREATE TABLE Users (
    GroupId     int(6),
    FirstName	VARCHAR(30),
    LastName	   VARCHAR(30),
-   Mail        VARCHAR(40),
+   Email        VARCHAR(40),
    Pass        VARCHAR(50), -- // TODO: Changer la longueur du varchar à celle du hash
    Admin       boolean,
-   MemberSince	Date,
+   SubDate     Datetime,
    PRIMARY KEY (UserId),
    CONSTRAINT fk_user_groupid FOREIGN KEY (GroupId)
    REFERENCES Groups(GroupId)
@@ -40,8 +40,8 @@ CREATE TABLE SCollec (
    SurvId      int(6) AUTO_INCREMENT,
    UserId      int(6),
    UseTime     int(6),
-   StartDate   Date,
-   FinishDate  Date,
+   StartDate   Datetime,
+   FinishDate  Datetime,
    DocId       int(6),
    Context     int(1),        -- Time and Place : 4 Option (both same or different)
    PRIMARY KEY (SurvId),
@@ -53,8 +53,8 @@ CREATE TABLE SPerso (
    SurvId      int(6) AUTO_INCREMENT,
    UserId      int(6),
    UseTime     int(6),
-   StartDate   Date,
-   FinishDate  Date,
+   StartDate   Datetime,
+   FinishDate  Datetime,
    DocId       int(6),
    PRIMARY KEY (SurvId),
    CONSTRAINT fk_sperso_userid FOREIGN KEY (UserId)

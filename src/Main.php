@@ -43,7 +43,7 @@ class Main
    * Example of Chips usage
    * @return (String):Computed content
    */
-   private function content()
+   private function demoContent()
    {
       // TODO: Séparer les méthodes spécifiques aux pages dans des classes spécifiques
       return
@@ -92,11 +92,19 @@ class Main
    * Final assembly of page elements
    * @return (String):Computed page
    */
-   function generateHome()
+   function generateDemo()
+   {
+      return $this->generatePage($this->demoContent());
+   }
+
+   /**
+   * Wraps content created by specific sub-class with general header and footer
+   */
+   protected function generatePage($content)
    {
       if (empty($header = $this->header()))
          $this->logError("header is empty");
-      if (empty($content = $this->content()))
+      if (empty($content))
          $this->logError("content is empty");
       if (empty($footer = $this->footer()))
          $this->logError("footer is empty");
@@ -109,7 +117,7 @@ class Main
                <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
                <!--Import Google Icon Font-->
-               <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+               <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
                <!--Import materialize.css-->
                <link type="text/css" rel="stylesheet" href="materialize/css/materialize.min.css"  media="screen,projection"/>
@@ -125,7 +133,7 @@ class Main
                <!--Import jQuery before materialize.js-->
                <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
                <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.js"></script>
-               <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+               <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.js"></script>
                <script type="text/javascript" src="js/chips.js"></script>
             </body>
          </html>';

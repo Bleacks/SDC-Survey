@@ -1,13 +1,14 @@
 <?php
 
 // TODO: Ajouter un champ Licence dans le composer.json
-require "vendor/autoload.php";
+require_once "vendor/autoload.php";
 
-// use Nom\De\Namespace\Trop\Long as court
 use Slim\App;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Src\Main as Main;
+use Src\Main;
+use Src\Subscribe;
+use Src\Database;
 
 $app = new App([
     'settings' => [
@@ -18,6 +19,7 @@ $app = new App([
 ]);
 
 // TODO: Main ne doit être utilisée que par les classes spécifiques, vers lesquelles Slim redirige
+// TODO: Refactor au plus simple les méthodes app->*
 
 $app->get('/Home', function (ServerRequestInterface $request, ResponseInterface $response) {
    return Main::workInProgressPage();
@@ -25,7 +27,7 @@ $app->get('/Home', function (ServerRequestInterface $request, ResponseInterface 
 
 $app->get('/Demo', function (ServerRequestInterface $request, ResponseInterface $response) {
    $main = new Main();
-   return $main->generateHome();
+   return $main->generateDemo();
 });
 
 $app->get('/Profile/{num}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
@@ -42,7 +44,33 @@ $app->get('/Settings', function (ServerRequestInterface $request, ResponseInterf
 });
 
 $app->get('/Subscribe', function (ServerRequestInterface $request, ResponseInterface $response) {
-    return Main::workInProgressPage();
+   $subscribe = new Subscribe();
+   return $subscribe->generatePageGet();
+});
+/* TODO: Supprimer la méthode liée dans la classe Subscribe
+$app->post('/Subscribe', function (ServerRequestInterface $request, ResponseInterface $response) use ($app) {
+   $subscribe = new Subscribe();
+   $app->redirect();
+   //return $subscribe->generatePagePost($request->getParsedBody());
+});
+*/
+// TEST
+$app->post('/Subscribe', function(ServerRequestInterface $request, ResponseInterface $response) use ($app) {
+   // TODO: Lien avec la BDD (Envoi et réception de données fonctionnel)
+   $db = Database::getInstance();
+   $post = $request->getParsedBody();
+   if (isset($post['email']) && !is_null($post['email']) && isset($post['password']) && !is_null($post['password']))
+      $db->subscribeUser($post['email'], $post['password']);
+});
+
+$app->get('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
+    $subscribe = new Subscribe();
+    return $subscribe->generatePageValidation($args['token']);
+});
+
+$app->post('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
+    $subscribe = new Subscribe();
+    return $subscribe->generatePageSubscribeEnd($request->getParsedBody());
 });
 
 $app->get('/Login', function (ServerRequestInterface $request, ResponseInterface $response) {
