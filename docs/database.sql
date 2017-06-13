@@ -6,7 +6,9 @@ DROP TABLE IF EXISTS PersoTool;
 DROP TABLE IF EXISTS Tool;
 DROP TABLE IF EXISTS SCollec;
 DROP TABLE IF EXISTS SPerso;
+DROP TABLE IF EXISTS PendingSub;
 DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Document;
 DROP TABLE IF EXISTS Groups;
 
 CREATE TABLE Role (
@@ -36,6 +38,13 @@ CREATE TABLE Users (
    REFERENCES Groups(GroupId)
 );
 
+CREATE TABLE Document (
+	DocId			int(6),
+	DocTitle		VARCHAR(50),
+	DocContent	VARCHAR(500),
+	PRIMARY KEY (DocId)
+);
+
 CREATE TABLE SCollec (
    SurvId      int(6) AUTO_INCREMENT,
    UserId      int(6),
@@ -46,7 +55,9 @@ CREATE TABLE SCollec (
    Context     int(1),        -- Time and Place : 4 Option (both same or different)
    PRIMARY KEY (SurvId),
    CONSTRAINT fk_scollec_userid FOREIGN KEY (UserId)
-   REFERENCES Users(UserId)
+   REFERENCES Users(UserId),
+   CONSTRAINT fk_scollec_docid FOREIGN KEY (DocId)
+   REFERENCES Document(DocId)
 );
 
 CREATE TABLE SPerso (
@@ -58,7 +69,9 @@ CREATE TABLE SPerso (
    DocId       int(6),
    PRIMARY KEY (SurvId),
    CONSTRAINT fk_sperso_userid FOREIGN KEY (UserId)
-   REFERENCES Users(UserId)
+   REFERENCES Users(UserId),
+   CONSTRAINT fk_sperso_docid FOREIGN KEY (DocId)
+   REFERENCES Document(DocId)
 );
 
 CREATE TABLE CollecRole (
@@ -108,3 +121,21 @@ CREATE TABLE PersoTool (
    CONSTRAINT fk_persotool_toolid FOREIGN KEY (ToolId)
    REFERENCES Tool(ToolId)
 );
+
+CREATE TABLE PendingSub (
+	UserId		int(6),
+	Token		VARCHAR(10),
+	SubDate		Datetime,
+	PRIMARY KEY (UserId, Token),
+	CONSTRAINT fk_pendingsub_userid FOREIGN KEY (UserId)
+	REFERENCES Users(UserId)
+);
+
+DROP EVENT IF EXISTS CleanPendingSub;
+-- Cleans pending subscription older than 1 day, comes in addition of the PhP duplicate token gestion
+CREATE EVENT CleanPendingSub
+	ON SCHEDULE EVERY '1' DAY
+	STARTS NOW()
+DO
+	DELETE FROM PendingSub WHERE TIMESTAMPDIFF(DAY, SubDate, NOW());
+   DELETE FROM Users WHERE Users.UserId like UserId;
