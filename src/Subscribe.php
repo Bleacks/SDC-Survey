@@ -21,60 +21,55 @@ class Subscribe extends Main
       // TODO: Ajouter des regex sur les form d'inscription et connexion
    }
 
+	/**
+	* Computes content of the page displayed when GET request on /Subscribe
+	*/
    public function generatePageGet()
    {
+		// TODO: Restore class from valid to validate in release mode and put back disabled button
+		// TODO: Ajouter un captcha pour limiter le nombre d'inscriptions
       $content =
 '<div class="row">
    <div class="row">
      <div class="input-field col s12">
-     <input name="email" id="email" type="email" class="validate tooltipped" value="m.m@m.m">
-       <label for="email" class="tooltipped">Email</label>
+     <input name="email" id="email" type="email" class="valid tooltipped" value="user@test.fr" autofocus>
+       <label for="email" class="tooltipped" data-error="Email not valid (example@sdc.com)" data-success="Email valid">Email</label>
      </div>
    </div>
    <div class="row">
      <div class="input-field col s12">
-       <input id="password" type="password" class="validate" value="pwd">
-       <label for="password">Password</label>
+       <input id="password" type="password" class="valid" value="pwd">
+       <label for="password" data-error="Password must be 5 chars length" data-success="Valid password">Password</label>
      </div>
    </div>
    <div class="row">
      <div class="input-field col s12">
-       <input id="password_confirm" type="password" class="validate">
-       <label for="password_confirm">Confirm Password</label>
+       <input id="password_confirm" type="password" class="valid" value="pwd">
+       <label for="password_confirm" data-error="Password not match" data-success="Password Match">Confirm Password</label>
      </div>
    </div>
-   <script type="text/javascript" src="js/Subscribe.js"></script>
-   <button class="btn waves-effect waves-light" onclick="createAccount()">Submit
+   <button id="send" class="btn waves-effect waves-light" onclick="createAccount()">Submit
       <i class="material-icons right">send</i>
    </button>
+
+	<!-- Modal that is shown to User after submitting the form -->
+	<div id="submitted" class="modal modal-fixed-footer">
+    <div class="modal-content">
+      <h4 id="modal_title"></h4>
+		<div class="progress">
+			<div id="modal_progression" class="indeterminate"></div>
+		</div>
+      <p id="modal_message"></p>
+    </div>
+    <div class="modal-footer">
+	 	<a id="btn_footer_close" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+      <a id="btn_footer_mail" target="_blank" href="http://www.gmail.com" class="modal-action modal-close waves-effect waves-green btn-flat ">Open Mail</a>
+    </div>
+  </div>
 </div>';
-      return parent::generatePage($content);
+      return parent::generatePage($content, array('FormConfirm', 'Subscribe'));
    }
-/*
-   public function generatePagePost($params)
-   {
-      // FIXME: Check if email already exists in database
-      // Create unique token
-      $token = '';
-      $chars = 'azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789';
-      for ($i = 0; $i < 8; $i++)
-         $token .= $chars[rand(0,61)];
 
-      // Initialize mail parameters
-      $email = $params['email'];
-      $subject = '[SDC-Survey] Please confirm your registration';
-      $message = 'Please confirm your registration by clicking on this link :\nlocalhost/bleacks/SDC-Survey/Subscribe/'. //\Slim\App::getInstance()->getName()
-      $token. '\nThis link will be active for the next 24h, it will then be automatically deleted from our servers.\nRegards';
-
-      //mail($email, $subject, $message);
-      var_dump($token);
-      // TODO: Ajouter les données dans la base et créer un trigger qui les supprime sous 24h
-      // TODO: Voir pour ajouter container + dependencies injection pour acceder à Slim et avoir le nom du site de manière dynamique
-
-      $content = 'Un mail vient de vous être envoyé à l\'adresse : ' . $email;
-      return parent::generatePage($content);
-   }
-*/
    /**
    * Compute page for subscribtion validation
    * @param $token : Unique token associated with the subscribtion request

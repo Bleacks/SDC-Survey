@@ -45,12 +45,23 @@ class Database
    public function subscribeUser($email, $password)
    {
       // TODO: Crypter le mot de passe dès l'envoi
-      $user = ORM::for_table('Users')->create();
+      $user = ORM::forTable('Users')->create();
 
       $user->Email = $email;
       $user->Pass = $password;
       $user->set_expr('SubDate', 'NOW()');
 
-      var_dump($user->save());
+      return $user->save();
+   }
+
+   /**
+   * Retrieves the User associated with this email adress
+   * @param $email Email of the searched User
+   */
+   public function getUser($email)
+   {
+      if (!is_null($email))
+         $user = ORM::forTable('Users')->where('email', $email)->findOne();
+      return $user;
    }
 }

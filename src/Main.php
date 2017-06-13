@@ -94,13 +94,13 @@ class Main
    */
    function generateDemo()
    {
-      return $this->generatePage($this->demoContent());
+      return $this->generatePage($this->demoContent(), array('chips'));
    }
 
    /**
    * Wraps content created by specific sub-class with general header and footer
    */
-   protected function generatePage($content)
+   protected function generatePage($content, $scripts = array())
    {
       if (empty($header = $this->header()))
          $this->logError("header is empty");
@@ -108,6 +108,10 @@ class Main
          $this->logError("content is empty");
       if (empty($footer = $this->footer()))
          $this->logError("footer is empty");
+
+      $scripts[] = 'Loading';
+      foreach ($scripts as $name)
+         $script .= '<script type="text/javascript" src="js/'.$name.'.js"></script>';
 
       return '<!DOCTYPE html>
          <html>
@@ -126,15 +130,15 @@ class Main
                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </head>
 
-            <body>
+            <body class="loading">
                '. $header
                 . $content
                 . $footer .'
                <!--Import jQuery before materialize.js-->
-               <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
-               <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.js"></script>
-               <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.js"></script>
-               <script type="text/javascript" src="js/chips.js"></script>
+               <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+               <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+               <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+               '.$script.'
             </body>
          </html>';
    }
@@ -146,14 +150,5 @@ class Main
    private function logError($message)
    {
       error_log('Error creating Main.php : ' . $message);
-   }
-
-   /**
-   * Returns the work in progress page
-   */
-   public static function workInProgressPage()
-   {
-      // TODO: Pimper la page, voir même utiliser un système de gestion d'erreur pour factoriser
-      return 'Work in progress';
    }
 }

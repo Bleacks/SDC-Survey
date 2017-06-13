@@ -47,20 +47,23 @@ $app->get('/Subscribe', function (ServerRequestInterface $request, ResponseInter
    $subscribe = new Subscribe();
    return $subscribe->generatePageGet();
 });
-/* TODO: Supprimer la méthode liée dans la classe Subscribe
-$app->post('/Subscribe', function (ServerRequestInterface $request, ResponseInterface $response) use ($app) {
-   $subscribe = new Subscribe();
-   $app->redirect();
-   //return $subscribe->generatePagePost($request->getParsedBody());
-});
-*/
-// TEST
+
 $app->post('/Subscribe', function(ServerRequestInterface $request, ResponseInterface $response) use ($app) {
-   // TODO: Lien avec la BDD (Envoi et réception de données fonctionnel)
    $db = Database::getInstance();
+	sleep(2);
    $post = $request->getParsedBody();
-   if (isset($post['email']) && !is_null($post['email']) && isset($post['password']) && !is_null($post['password']))
-      $db->subscribeUser($post['email'], $post['password']);
+   if (isset($post['email']) && isset($post['password']) && !is_null($post['email']) && !is_null($post['password'])) {
+      if ($db->getUser($post['email']) == false)
+      {
+         if ($db->subscribeUser($post['email'], $post['password']))
+            $res = $response->withStatus(200);
+         else
+            $res = $response->withStatus(424);
+      } else
+         $res = $response->withStatus(409);
+   }
+   return $res;
+
 });
 
 $app->get('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
