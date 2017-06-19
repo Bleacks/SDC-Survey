@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Src\Main;
 use Src\Subscribe;
 use Src\Database;
+use Src\MailManager;
 
 $app = new App([
     'settings' => [
@@ -21,63 +22,84 @@ $app = new App([
 // TODO: Main ne doit être utilisée que par les classes spécifiques, vers lesquelles Slim redirige
 // TODO: Refactor au plus simple les méthodes app->*
 
-$app->get('/Home', function (ServerRequestInterface $request, ResponseInterface $response) {
+$app->get('/Home', function (ServerRequestInterface $request, ResponseInterface $response)
+{
    return Main::workInProgressPage();
 });
 
-$app->get('/Demo', function (ServerRequestInterface $request, ResponseInterface $response) {
+$app->get('/Demo', function (ServerRequestInterface $request, ResponseInterface $response)
+{
    $main = new Main();
    return $main->generateDemo();
 });
 
-$app->get('/Profile/{num}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
+$app->get('/Profile/{num}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
+{
     #return 'Profil numéro '.$args['num'];
     return Main::workInProgressPage();
 });
 
-$app->get('/Messages', function (ServerRequestInterface $request, ResponseInterface $response) {
+$app->get('/Messages', function (ServerRequestInterface $request, ResponseInterface $response)
+{
+	MailManager::testMail();
+	return Main::workInProgressPage();
+});
+
+$app->get('/Settings', function (ServerRequestInterface $request, ResponseInterface $response)
+{
     return Main::workInProgressPage();
 });
 
-$app->get('/Settings', function (ServerRequestInterface $request, ResponseInterface $response) {
-    return Main::workInProgressPage();
-});
-
-$app->get('/Subscribe', function (ServerRequestInterface $request, ResponseInterface $response) {
+$app->get('/Subscribe', function (ServerRequestInterface $request, ResponseInterface $response)
+{
    $subscribe = new Subscribe();
-   return $subscribe->generatePageGet();
+   return $subscribe->getPageSubscribe();
 });
 
-$app->post('/Subscribe', function(ServerRequestInterface $request, ResponseInterface $response) use ($app) {
-   $db = Database::getInstance();
+$app->post('/Subscribe', function(ServerRequestInterface $request, ResponseInterface $response) use ($app)
+{
 	sleep(2);
-   $post = $request->getParsedBody();
-   if (isset($post['email']) && isset($post['password']) && !is_null($post['email']) && !is_null($post['password'])) {
-      if ($db->getUser($post['email']) == false)
-      {
-         if ($db->subscribeUser($post['email'], $post['password']))
-            $res = $response->withStatus(200);
-         else
-            $res = $response->withStatus(424);
-      } else
-         $res = $response->withStatus(409);
-   }
-   return $res;
-
+	$db = Database::getInstance();
+   	$post = $request->getParsedBody();
+   	if (isset($post['email']) && isset($post['password']) && !is_null($post['email']) && !is_null($post['password'])) {
+      	if ($db->getUser($post['email']) == false)
+      	{
+         	if ($db->subscribeUser($post['email'], $post['password']))
+            	$res = $response->withStatus(200);
+         	else
+            	$res = $response->withStatus(424);
+      	} else
+         	$res = $response->withStatus(409);
+   	}
+   	return $res;
 });
 
-$app->get('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-    $subscribe = new Subscribe();
-    return $subscribe->generatePageValidation($args['token']);
+$app->get('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
+{
+	// TODO: Remettre en forme les accolades de ce fichier
+	$subscribe = new Subscribe();
+	$db = Database::getInstance();
+	$token = $args['token'];
+	$regex = '/^[a-zA-Z0-9]{10}$/i';
+
+	if (preg_match($regex, $token) && strlen($token) == 10)
+	{
+		if ($db->verifyToken($token))
+		{
+			$res = $subscribe->getPageSubscribeConfirmation($token);
+		} else {
+			$res = $subscribe->getPagePerishedConfirmation($token);
+		}
+	} else {
+		$res = $response->withStatus(422);
+	}
+
+    return $res;
 });
 
-$app->post('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-    $subscribe = new Subscribe();
-    return $subscribe->generatePageSubscribeEnd($request->getParsedBody());
-});
-
-$app->get('/Login', function (ServerRequestInterface $request, ResponseInterface $response) {
-    return Main::workInProgressPage();
+$app->get('/Login', function (ServerRequestInterface $request, ResponseInterface $response)
+{
+	return Main::workInProgressPage();
 });
 
 $app->run();

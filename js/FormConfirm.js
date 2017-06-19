@@ -1,29 +1,52 @@
 // At least 1 letter AND (1 number OR spec char) AND length > 5
 $(document).ready(function() {
 
+	// TODO: message d'erreur pour le mot de passe et mail à revoir
     var pass = $('#password');
     var conf = $('#password_confirm');
     var send = $('#send');
-    var regex = new RegExp("^[A-Za-z]+([0-9]|[,;:!\/\*$&-+])+$");
+	var mail = $('#email');
+    var regex_pass = new RegExp("^[A-Za-z0-9,;:!\/\*$&-+]{5,25}$");
+	var regex_pass2 = new RegExp("^.*[0-9].*$");
+	var regex_mail = new RegExp('^([\\w\\-\\._]+\\@[\\w\\-_]+\\.[\\w\\-\\._]+)$');
+	console.log(regex_mail);
+	// TODO: °Voir avec Xaviera si on utilise les mails étudiants (mieux) ^[\w-._]+\@(etu\.)?univ-lorraine\.fr
 
-    pass.on("keyup", function(e) {
+	// FIXME: Retirer les init de valid pour la mise en production
+	pass.isValid = true;
+	conf.isValid = true;
+	mail.isValid = true;
+
+	mail.on("input", function(e) {
+		verifyMail();
+	});
+
+    pass.on("input", function(e) {
 		 verifyPass();
     });
 
-    conf.on("keyup", function(e) {
+    conf.on("input", function(e) {
 		 verifyConf();
     });
 
     function verifyButton() {
-		if (pass.isValid == true && conf.isValid == true)
+		if (pass.isValid == true && conf.isValid == true && mail.isValid == true)
 			send.removeClass('disabled');
 		else
 			send.addClass('disabled');
     }
 
+	 function verifyMail() {
+		if (regex_mail.test(mail.val()))
+			validMail();
+		else
+		 	invalidMail();
+		clean(mail);
+	 }
+
 	function verifyPass() {
 		var value = pass.val();
-		if (regex.test(value) && value.length > 5)
+		if (regex_pass.test(value) && regex_pass2.test(value))
 		   validPass();
 		else
 		   invalidPass();
@@ -46,8 +69,15 @@ $(document).ready(function() {
 		}
     }
 
+	 function validMail() {
+		if (mail.val() == '')
+			clean(mail);
+		else
+			validInput(mail);
+	 }
+
     function validPass() {
-      validInput(pass);
+		validInput(pass);
     }
 
     function validConf() {
@@ -62,8 +92,12 @@ $(document).ready(function() {
     }
 
     function invalidConf() {
-      invalidInput(conf);
+      	invalidInput(conf);
     }
+
+	 function invalidMail() {
+		invalidInput(mail);
+	 }
 
     function invalidInput(e) {
 		e.removeClass('valid').removeClass('validate').addClass('invalid');
@@ -76,9 +110,8 @@ $(document).ready(function() {
 		e.isValid = true;
 		verifyButton();
     }
-    /* TODO: Ajouter des tooltips sur tous les champs du formulaire :focus
-    $('.tooltipped').on("focusin", function(){
-       $('.tooltipped').tooltip();
-    });
-	 */
+    // TODO: Ajouter des tooltips sur tous les champs du formulaire :focus
+    /*$('.tooltipped').on("focusin", function(){
+       $('.tooltipped').tooltip().show();
+   });*/
 });

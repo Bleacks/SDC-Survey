@@ -24,18 +24,19 @@ class Main
    private function header()
    {
       // TODO: Rediriger les href du header
-      return '<header>
-  <nav>
-    <div class="nav-wrapper">
-      <a href="Accueil" class="brand-logo">Logo</a>
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="Home">Home</a></li>
-        <li><a href="Profile/54">Profile</a></li>
-        <li><a href="Messages">Messages</a></li>
-        <li><a href="Settings">Settings</a></li>
-      </ul>
-    </div>
-  </nav>
+      return '
+<header>
+	<nav>
+    	<div class="nav-wrapper">
+      		<a href="Accueil" class="brand-logo">SDC-Survey</a>
+			<ul id="nav-mobile" class="right hide-on-med-and-down">
+				<li><a href="Home">Home</a></li>
+				<li><a href="Profile/54">Profile</a></li>
+				<li><a href="Messages">Messages</a></li>
+				<li><a href="Settings">Settings</a></li>
+			</ul>
+		</div>
+	</nav>
 </header>';
    }
 
@@ -46,11 +47,11 @@ class Main
    private function demoContent()
    {
       // TODO: Séparer les méthodes spécifiques aux pages dans des classes spécifiques
-      return
-      '<div class="chips chips-placeholder chips-autocomplete chips-initial" data-index="0" data-initialized="true">
-         <input id="e2b78123-5a53-e67d-d60c-8293d451905a" class="input" placeholder="">
-         <ul class="autocomplete-content dropdown-content"></ul>
-      </div>';
+      return '
+<div class="chips chips-placeholder chips-autocomplete chips-initial" data-index="0" data-initialized="true">
+	<input id="e2b78123-5a53-e67d-d60c-8293d451905a" class="input" placeholder="">
+	<ul class="autocomplete-content dropdown-content"></ul>
+</div>';
    }
 
    /**
@@ -61,31 +62,34 @@ class Main
    {
       // TODO: Ajouter les liens vers les autres pages
       // TODO: Ajouter une description
-      return '<footer class="page-footer">
-          <div class="container">
-            <div class="row">
-              <div class="col l6 s12">
-                <h5 class="white-text">SDC-Survey Web Platform</h5>
-                <p class="grey-text text-lighten-4">Desciption</p>
-              </div>
-              <div class="col l4 offset-l2 s12">
-                <h5 class="white-text">Navigation</h5>
-                <ul>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="footer-copyright">
-            <div class="container">
-            © 2017 Copyright Text
-            <a class="grey-text text-lighten-4 right" href="https://www.list.lu/">LIST</a>
-            </div>
-          </div>
-        </footer>';
+      return '
+<footer class="page-footer">
+	<div class="container">
+    	<div class="row">
+			<div class="col l6 s12">
+				<h5 class="white-text">SDC-Survey Web Platform</h5>
+				<p class="grey-text text-lighten-4">Desciption</p>
+			</div>
+
+			<div class="col l4 offset-l2 s12">
+				<h5 class="white-text">Navigation</h5>
+				<ul hidden>
+					<li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+					<li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+					<li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+					<li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="footer-copyright">
+		<div class="container">
+			© 2017 Copyright Text
+			<a class="grey-text text-lighten-4 right" href="https://www.list.lu/">LIST</a>
+		</div>
+	</div>
+</footer>';
    }
 
    /**

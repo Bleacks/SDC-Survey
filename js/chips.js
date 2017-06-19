@@ -8,9 +8,10 @@ $( document ).ready(function() {
    };
    var chips = {
       Rachel: Rachel,
-      Guillaume: null,
-      Eloïse: null,
-      Marine: null,
+      Lucidchart: null,
+      Architek: null,
+      Blender: null,
+	  SketchUp: null
    };
 
    // Treating different chips types
