@@ -106,45 +106,47 @@ class Main
    */
    protected function generatePage($content, $scripts = array())
    {
-      if (empty($header = $this->header()))
-         $this->logError("header is empty");
-      if (empty($content))
-         $this->logError("content is empty");
-      if (empty($footer = $this->footer()))
-         $this->logError("footer is empty");
+		$scripts[] = 'Loading';
+		foreach ($scripts as $name)
+			$script .= '<script type="text/javascript" src="js/'.$name.'.js"></script>';
 
-      $scripts[] = 'Loading';
-      foreach ($scripts as $name)
-         $script .= '<script type="text/javascript" src="js/'.$name.'.js"></script>';
+		return '<!DOCTYPE html>
+		 <html>
+		    <head>
+		       <!--Initialize environment-->
+		       <base href="/bleacks/SDC-Survey/" />
+		       <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
-      return '<!DOCTYPE html>
-         <html>
-            <head>
-               <!--Initialize environment-->
-               <base href="/bleacks/SDC-Survey/" />
-               <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+		       <!--Import Google Icon Font-->
+		       <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-               <!--Import Google Icon Font-->
-               <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+			   <!--Import materialize.css-->
+			   <link type="text/css" rel="stylesheet" href="materialize/css/materialize.min.css" media="screen,projection">
 
-               <!--Import materialize.css-->
-               <link type="text/css" rel="stylesheet" href="materialize/css/materialize.min.css"  media="screen,projection"/>
+			   <!--Import personnal CSS File-->
+			   <link type="text/css" rel="stylesheet" href="css/Stylesheet.css" media="screen,projection">
 
-               <!--Let browser know website is optimized for mobile-->
-               <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            </head>
+			   <!--Let browser know website is optimized for mobile-->
+		       <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		    </head>
 
-            <body class="loading">
-               '. $header
-                . $content
-                . $footer .'
-               <!--Import jQuery before materialize.js-->
-               <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-               <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-               <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
-               '.$script.'
-            </body>
-         </html>';
+		    <body class="loading">
+		       '. $this->header()
+		        . '
+			<main>
+				'
+				. $content
+				. '
+			</main>
+			'
+		        . $this->footer() .'
+		       <!--Import jQuery before materialize.js-->
+		       <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		       <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+		       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+		       '.$script.'
+		    </body>
+		 </html>';
    }
 
    /**

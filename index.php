@@ -41,13 +41,13 @@ $app->get('/Profile/{num}', function (ServerRequestInterface $request, ResponseI
 
 $app->get('/Messages', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-	MailManager::testMail();
+	MailManager::testMailer();
 	return Main::workInProgressPage();
 });
 
 $app->get('/Settings', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-    return Main::workInProgressPage();
+	return Main::workInProgressPage();
 });
 
 $app->get('/Subscribe', function (ServerRequestInterface $request, ResponseInterface $response)
@@ -82,7 +82,10 @@ $app->get('/Subscribe/{token}', function (ServerRequestInterface $request, Respo
 	$token = $args['token'];
 	$regex = '/^[a-zA-Z0-9]{10}$/i';
 
-	if (preg_match($regex, $token) && strlen($token) == 10)
+	// TODO: Ajouter une modale avec crécupéreation des données du serveur et en cas de non validité afficher l'erreur dedans, la fermer sinon et permettre l'inscription
+	// TODO: Ajouter une suppression des tokens on register confirm
+
+	if (preg_match($regex, $token))
 	{
 		if ($db->verifyToken($token))
 		{
