@@ -74,7 +74,7 @@ class Database
 	  $token = '';
 	  for ($i = 0; $i < 10; $i++)
 	  {
-		  $token .= $alphabet[rand(0,62)];
+		  $token .= $alphabet[rand(0,61)];
 	  }
 	  $sub->Token = $token;
 	  $sub->idU = $user->id();
