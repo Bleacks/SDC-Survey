@@ -34,6 +34,9 @@ class Subscribe extends Main
 		// FIXME: Ajouter une méthode d'ajout de scripts automatique
       $content =
 '<div class="row">
+
+	<div class="col s12">
+
 	<div class="row">
 		<div class="input-field col s12">
 			<input name="email" id="email" type="email" class="valid"  value="test@user.fr" autofocus>
@@ -57,6 +60,8 @@ class Subscribe extends Main
 	<button id="send" type="submit" class="btn waves-effect waves-light" onclick="createAccount()">Submit
 		<i class="material-icons right">send</i>
 	</button>
+
+	</div>
 
 	<!-- Modal that is shown to User after submitting the form -->
 	<div id="submitted" class="modal modal-fixed-footer">
@@ -91,6 +96,7 @@ class Subscribe extends Main
       return parent::generatePage($content, array('FormConfirm', 'Subscribe'));
    }
 
+   // FIXME: Ajouter les informations dans la base de données
    /**
    * Compute page for subscribtion validation
    * @param $token : Unique token associated with the subscribtion request
@@ -118,8 +124,15 @@ class Subscribe extends Main
 
       <div class="row">
          <div class="input-field col s6">
-            <input id="last_name" type="text" class="validate">
-            <label for="last_name">Last Name</label>
+            <input id="ville" type="text" class="validate">
+            <label for="ville">Ville</label>
+         </div>
+      </div>
+
+	  <div class="row">
+         <div class="input-field col s6">
+            <input id="Age" type="number" max="100" min="0" class="validate">
+            <label for="ville" data-error="Veuillez entrer un age correct">Age</label>
          </div>
       </div>
 
@@ -131,7 +144,6 @@ class Subscribe extends Main
       return parent::generatePage($content, $scripts);
    }
 
-   // FIXME: Ajouter les informations dans la base de données
    /**
    * Insert information for subscription validation
    * @param (String)$params : data send in POST request

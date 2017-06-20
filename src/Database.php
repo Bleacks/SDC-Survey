@@ -104,16 +104,23 @@ class Database
    public function verifyToken($token)
    {
 	   	$sub = ORM::forTable('PendingSub')->where('Token', $token)->findOne();
-	   	$date = new DateTime($sub->SubscribedAt, new DateTimeZone("Europe/Paris"));
-	   	$now = new DateTime("now", new DateTimeZone("Europe/Paris"));
-		$isValid = $now->diff($date)->days == 0 && $sub != false;
 
-	   	if ($isValid)
-	   	{
-			$user = ORM::forTable('Users')->findOne($sub->idU);
-	   		$sub->delete();
-			$user->delete();
-	   	}
-	   	return $isValid;
-   }
+		$isValid = $sub != false;
+
+		if ($isValid)
+		{
+		   	$date = new DateTime($sub->SubscribedAt, new DateTimeZone("Europe/Paris"));
+		   	$now = new DateTime("now", new DateTimeZone("Europe/Paris"));
+			$isValid = $now->diff($date)->days == 0;
+
+		   	if (!$isValid)
+		   	{
+				$user = ORM::forTable('Users')->findOne($sub->idU);
+		   		$sub->delete();
+				$user->delete();
+		   	}
+		}
+		
+		return $isValid;
+	}
 }
