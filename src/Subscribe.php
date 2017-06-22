@@ -57,7 +57,7 @@ class Subscribe extends Main
 			<label class="required" for="password_confirm" data-error="Password not match" data-success="Password Match">Confirm Password</label>
 		</div>
 	</div>
-	<button id="send" type="submit" class="btn waves-effect waves-light" onclick="createAccount()">Submit
+	<button id="send" type="submit" class="btn waves-effect waves-light" onclick="createAccount()">Envoyer
 		<i class="material-icons right">send</i>
 	</button>
 
@@ -106,40 +106,68 @@ class Subscribe extends Main
 	   // TODO: Rename JS File (FormConfirm => SubscribeFormValidator)
 	   $scripts = array('SubscribeConfirmation', 'SubscribeConfirmationValidator');
 	   $content = '
-<div class="row">
+<div class="container">
+	<div class="row">
 
-      <div class="row">
-         <div class="input-field col s6">
-            <input id="first_name" type="text" class="validate">
-            <label for="first_name">First Name</label>
-         </div>
-      </div>
+		<h3>Veuillez renseigner ces informations pour terminer votre inscription</h3>
 
-      <div class="row">
-         <div class="input-field col s6">
-            <input id="last_name" type="text" class="validate">
-            <label for="last_name">Last Name</label>
-         </div>
-      </div>
+		<div class="row" id="letest">
+			<div class="col validator">
+				<input class="indeterminate-checkbox" id="first_name_status" type="checkbox" />
+				<label class="empty_label"></label>
+			</div>
 
-      <div class="row">
-         <div class="input-field col s6">
-            <input id="ville" type="text" class="validate">
-            <label for="ville">Ville</label>
-         </div>
-      </div>
+			<div class="input-field col s6">
+		        <input id="first_name" type="text" class="confirmation" autofocus>
+		        <label for="first_name">First Name</label>
+	        </div>
+		</div>
 
-	  <div class="row">
-         <div class="input-field col s6">
-            <input id="Age" type="number" max="100" min="0" class="validate">
-            <label for="ville" data-error="Veuillez entrer un age correct">Age</label>
-         </div>
-      </div>
+		<div class="row">
+			<div class="col">
+				<input type="checkbox" class="indeterminate-checkbox" id="last_name_status"/>
+				<label class="empty_label"></label>
+			</div>
 
-      <button class="btn waves-effect waves-light" type="submit" onclick="confirmSubscription(token)">Sumbit
-         <i class="material-icons right">send</i>
-      </button>
+	  		<div class="input-field col s6">
+				<input id="last_name" type="text" class="confirmation" required>
+				<label for="last_name">Last Name</label>
+	        </div>
+		</div>
 
+		<div class="row">
+			<div class="col">
+				<input type="checkbox" class="indeterminate-checkbox" id="city_status"/>
+				<label class="empty_label"></label>
+			</div>
+
+			<div class="input-field col s6">
+			  	<select id="city" required="required">
+				  <option value="" selected disabled>Choisissez votre ville</option>
+				  <option value="1">Liège</option>
+				  <option value="2">Nancy</option>
+			  	</select>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col">
+				<input type="checkbox" class="indeterminate-checkbox" id="age_status" />
+				<label class="empty_label"></label>
+			</div>
+
+	    	<div class="input-field col s6">
+	            <input id="age" type="number" class="confirmation">
+	            <label for="age">Age</label>
+	        </div>
+		</div>
+
+
+		<button id="send" class="btn waves-effect waves-light disabled" type="submit" onclick="confirmSubscription(\''.$token.'\')">Envoyer
+			<i class="material-icons right">send</i>
+		</button>
+
+	</div>
 </div>';
       return parent::generatePage($content, $scripts);
    }
@@ -148,7 +176,7 @@ class Subscribe extends Main
    * Insert information for subscription validation
    * @param (String)$params : data send in POST request
    */
-   public function getPagePerishedConfirmation($token)
+   public function getPagePerishedConfirmation()
    {
       $content = 'Ce lien a expiré, votre inscription à eu lieu il y a plus de 24h, vous devez recommencer';
       return parent::generatePage($content);
