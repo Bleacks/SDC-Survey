@@ -1,3 +1,6 @@
+/**
+* Changes front-end informations when completing form fields
+*/
 $(document).ready(function() {
 
 	// Initializes graphical elements of the associated page
@@ -7,7 +10,7 @@ $(document).ready(function() {
 	$('.indeterminate-checkbox').css('cursor', 'default');
 
 	// TODO: Ajust display of differents elements
-	// FIXME: Disable focus on tab for checkboxes
+	// FIXME: Add red asterisk on input.select-dropdown
 
 	// Array of fields that has to be updated on
 	var onkeyup = ['#first_name', '#last_name', '#age'];
@@ -17,7 +20,7 @@ $(document).ready(function() {
 	};
 
 	// Array of fields that has to be updated on change
-	var onchange = ['#city', '#age'];
+	var onchange = ['#city'];
 
 	// Adds listener for on change event
 	for (var i = 0; i < 2; i++) {
@@ -34,7 +37,6 @@ $(document).ready(function() {
 
 	/** Changes the state of the given checkbox to checked or indeterminate base on given boolean */
 	function validate(element, valid) {
-		console.log(valid);
 		$(element + '_status').prop('checked', valid).prop('indeterminate', !valid);
 	}
 

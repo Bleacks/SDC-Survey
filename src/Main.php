@@ -106,11 +106,13 @@ class Main
    */
    protected function generatePage($content, $scripts = array())
    {
-		$scripts[] = 'Loading';
-		foreach ($scripts as $name)
-			$script .= '<script type="text/javascript" src="js/'.$name.'.js"></script>';
+	   $script = '';
+	   $scripts[] = 'Loading';
+	   foreach ($scripts as $name)
+	   		$script .= '<script type="text/javascript" src="js/'.$name.'.js"></script>
+			';
 
-		return '<!DOCTYPE html>
+	   return '<!DOCTYPE html>
 		 <html>
 		    <head>
 		       <!--Initialize environment-->
