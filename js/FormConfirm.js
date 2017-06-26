@@ -109,8 +109,15 @@ $(document).ready(function() {
 		e.isValid = true;
 		verifyButton();
     }
-    // TODO: Ajouter des tooltips sur tous les champs du formulaire :focus
-    /*$('.tooltipped').on("focusin", function(){
-       $('.tooltipped').tooltip().show();
-   });*/
+	$('#send').on("keyup keypress", function(event) {
+		var keyCode = event.keyCode || event.which;
+		if (keyCode == 13)
+			createAccount();
+	});
+   
+   // TODO: Ajouter des tooltips sur tous les champs du formulaire :focus
+   /*
+   $('.tooltipped').on("focusin", function(){
+   		$('.tooltipped').tooltip().show();
+});*/
 });

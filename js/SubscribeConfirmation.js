@@ -9,7 +9,7 @@ confirmSubscription = (function() {
 
 	return function(token) {
 
-		if (first !== $('#first_name').val() || last_name !== $('#last_name').val() ||
+		if (first !== $('#first_name').val() || last !== $('#last_name').val() ||
 		age !== $('#age').val() || city !== $('#city').val())
 		{
 			// Enable modal
@@ -53,7 +53,7 @@ confirmSubscription = (function() {
 						 if (i <= 10) {
 							 $('#modal_progression').css('width', (i*10) + '%');
 							 i++;
-							 setTimeout(tempo, 200);
+							 setTimeout(tempo, 20);
 						 } else
 							 // Stores the response.status in order to hide ancient answer for next modal
 							 i = response.status;
@@ -62,40 +62,37 @@ confirmSubscription = (function() {
 					 $('#modal_progression').removeClass('indeterminate').addClass('determinate');
 					 $('#modal_title').text("Envoi en cours...");
 					 tempo();
-					 setTimeout(feedback, 2400);
+					 setTimeout(feedback, 240);
 
+					 // FIXME: Remettre les timeout sur *10
+
+					 // TODO: Rename les JS
+					 // TODO: Fusionner les JS ajax
+					 /**
+					 * Method called after loading-like delay of 'tempo'
+					 * Changes modal's content to inform user of the request answer
+					 */
 					 function feedback() {
 						 $('#modal_title').hide();
-						 switch (response.status) {
-							 case 200:
-						 			$('#modal_title_200').show();
-									$('#modal_message_200').show();
-									$('#btn_footer_mail').show();
-							 		break;
-
-							 case 409:
-									$('#modal_title_409').show();
-									$('#modal_message_409').show();
-									break;
-
-							 case 424:
-									$('#modal_title_424').show();
-									$('#modal_message_424').show();
-									break;
-
-							 case 429:
-									$('#modal_title_429').show();
-									$('#modal_message_429').show();
-									break;
-
-				  			 default:
-									// TODO: Ajouter l'adresse mail du futur administrateur
-									// TODO: Log automatique des erreurs sur l'adresse mail de l'administrateur (disclaimer pour l'adresse perso)
-									// TODO: Voir si les h4 vides prennent de la place ou non
-									$('modal_title').show();
-									$('#modal_title').text('Error ['+ response.status +'] : '+ response.statusText);
-									$('#modal_message_err').text('Contact system admin, and provide him thoses informations : \n' + 'Error ['+ response.status +'] : '+ response.statusText + ' : '+ response.responseText);
+						 var status = response.status;
+						 if (status == 200)
+						 {
+							 // In case of successfull submition
+							 $('#btn_footer_mail').show();
 						 }
+						 // In case of unsuccessfull submition we check if error is already handled, if not generic error message is displayed
+						 else if (undefined == $('#modal_title_' + status)[0])
+						 {
+							 // TODO: Ajouter l'adresse mail du futur administrateur
+							 // TODO: Log automatique des erreurs sur l'adresse mail de l'administrateur (disclaimer pour l'adresse perso)
+							 $('#modal_title_err').text('Error ['+ status +'] : '+ response.statusText);
+							 $('#modal_message_err').text('Contact system admin, and provide him thoses informations : \n' + 'Error ['+ status +'] : '+ response.statusText + ' : '+ response.responseText);
+							 $('#modal_title_err').attr('id', 'modal_title_' + status);
+							 $('#modal_message_err').attr('id', 'modal_message_' + status);
+						 }
+
+						 $('#modal_title_' + status).show();
+						 $('#modal_message_' + status).show();
 					 }
 		       }
 		    });

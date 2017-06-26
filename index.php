@@ -105,7 +105,7 @@ $app->get('/Subscribe/{token}', function (ServerRequestInterface $request, Respo
 		{
 			$res = $subscribe->getPageSubscribeConfirmation($token);
 		} else {
-			$res = $subscribe->getPagePerishedConfirmation();
+			$res = $response->withStatus(422);
 			$db->deletePendingSubscription($pendingSub);
 		}
 	} else {

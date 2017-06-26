@@ -59,38 +59,23 @@
 
 					 function feedback() {
 						 $('#modal_title').hide();
-						 //$('.modal').modal();
-						 //$('#submitted').modal('open');
-						 switch (response.status) {
-							 case 200:
-						 			$('#modal_title_200').show();
-									$('#modal_message_200').show();
-									$('#btn_footer_mail').show();
-							 		break;
-
-							 case 409:
-									$('#modal_title_409').show();
-									$('#modal_message_409').show();
-									break;
-
-							 case 424:
-									$('#modal_title_424').show();
-									$('#modal_message_424').show();
-									break;
-
-							 case 429:
-									$('#modal_title_429').show();
-									$('#modal_message_429').show();
-									break;
-
-				  			 default:
-									// TODO: Ajouter l'adresse mail du futur administrateur
-									// TODO: Log automatique des erreurs sur l'adresse mail de l'administrateur (disclaimer pour l'adresse perso)
-									// TODO: Voir si les h4 vides prennent de la place ou non
-									$('modal_title').show();
-									$('#modal_title').text('Error ['+ response.status +'] : '+ response.statusText);
-									$('#modal_message_err').text('Contact system admin, and provide him thoses informations : \n' + 'Error ['+ response.status +'] : '+ response.statusText + ' : '+ response.responseText);
+						 var status = response.status;
+						 if (status == 200)
+						 {
+							 $('#btn_footer_mail').show();
 						 }
+						 else if (undefined == $('#modal_title_' + status)[0])
+						 {
+							 // TODO: Ajouter l'adresse mail du futur administrateur
+							 // TODO: Log automatique des erreurs sur l'adresse mail de l'administrateur (disclaimer pour l'adresse perso)
+							 $('#modal_title_err').text('Error ['+ status +'] : '+ response.statusText);
+							 $('#modal_message_err').text('Contact system admin, and provide him thoses informations : \n' + 'Error ['+ status +'] : '+ response.statusText + ' : '+ response.responseText);
+							 $('#modal_title_err').attr('id', 'modal_title_' + status);
+							 $('#modal_message_err').attr('id', 'modal_message_' + status);
+						 }
+
+						 $('#modal_title_' + status).show();
+						 $('#modal_message_' + status).show();
 					 }
 		       }
 		    });
@@ -99,9 +84,3 @@
 	    // TODO: Afficher le contenu seulement après le chargement de toutes les ressources de la page après un loading gif
 	}
 })();
-
-$('#send').on("keyup keypress", function(event) {
-	var keyCode = event.keyCode || event.which;
-	if (keyCode == 13)
-		createAccount();
-});

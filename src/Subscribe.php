@@ -34,66 +34,128 @@ class Subscribe extends Main
 		// FIXME: Ajouter une méthode d'ajout de scripts automatique
       $content =
 '<div class="row">
-
 	<div class="col s12">
 
-	<div class="row">
-		<div class="input-field col s12">
-			<input name="email" id="email" type="email" class="valid"  value="test@user.fr" autofocus>
-			<label class="required" for="email" data-error="Email not valid (example@sdc.com)" data-success="Email valid">Email</label>
-		</div>
-   </div>
+		<div class="row">
+			<div class="input-field col s12">
+				<input name="email" id="email" type="email" class="valid"  value="test@user.fr" autofocus>
+				<label class="required" for="email" data-error="Email not valid (example@sdc.com)" data-success="Email valid">Email</label>
+			</div>
+	   </div>
 
-	<div class="row">
-		<div class="input-field col s12">
-			<input id="password" type="password" class="required valid" value="azer1">
-			<label class="required" for="password" data-error="Password must be 5 chars length" data-success="Valid password">Password</label>
+		<div class="row">
+			<div class="input-field col s12">
+				<input id="password" type="password" class="required valid" value="azer1">
+				<label class="required" for="password" data-error="Password must be 5 chars length" data-success="Valid password">Password</label>
+			</div>
 		</div>
-	</div>
 
-	<div class="row">
-		<div class="input-field col s12">
-			<input id="password_confirm" type="password" class="required valid" value="azer1">
-			<label class="required" for="password_confirm" data-error="Password not match" data-success="Password Match">Confirm Password</label>
+		<div class="row">
+			<div class="input-field col s12">
+				<input id="password_confirm" type="password" class="required valid" value="azer1">
+				<label class="required" for="password_confirm" data-error="Password not match" data-success="Password Match">Confirm Password</label>
+			</div>
 		</div>
-	</div>
-	<button id="send" type="submit" class="btn waves-effect waves-light" onclick="createAccount()">Envoyer
-		<i class="material-icons right">send</i>
-	</button>
 
+		<button id="send" type="submit" class="btn waves-effect waves-light" onclick="createAccount()">Envoyer
+			<i class="material-icons right">send</i>
+		</button>
 	</div>
 
 	<!-- Modal that is shown to User after submitting the form -->
-	' . $this->subscribeModal() . '
+	' . $this->generateSubscribeModal() . '
 
 </div>';
-      return parent::generatePage($content, array('FormConfirm', 'Subscribe'));
+      //return parent::generatePage($content, array('FormConfirm', 'Subscribe'));
+	  return parent::generatePage($content, array('FormConfirm', 'Subscription'));
    }
 
-	private function subscribeModal()
+	/**
+	* Generates modal view displayed after submit button is clicked on 'Subscribe'
+	* Calls generic modal creator 'generateModal'
+	* @return $this->generateModal : generated modal
+	*/
+	private function generateSubscribeModal()
 	{
-		return
+	   return $this->generateModal(
+		   array(
+			   "200" => "Inscription envoyée",
+			   "409" => "Adresse email déjà utilisée"
+		   ),
+		   array(
+			   "200" => "Veuillez vérifier vos mails et cliquer sur le lien qui vous à été envoyé.\nSi vous ne confirmer pas votre inscription dans les 24h la demande sera suprimée, vous devrez alors vous réinscrire.",
+			   "409" => "Veuillez consulter vos mails pour vérifier qu\'une inscription que vous avez effectué est en attente. Toute inscription non confirmée dans les 24h sera suprimée, vous pourrez alors vous réinscire."
+		   )
+	   );
+	}
+
+
+	/**
+	* Generates modal view displayed after submit button is clicked on 'Subscribe/[token]'
+	* Calls generic modal creator 'generateModal'
+	* @return $this->generateModal : generate modal
+	*/
+	private function generateSubscribeConfirmationModal()
+	{
+	   // TODO: Ajouter un lien pour se connecter en cliquant ici dans le message de succes
+	   // TODO: Ajouter un lien pour s'inscrire directement dans le message d'erreur
+	   return $this->generateModal(
+		   array(
+			   "200" => "Inscription terminée",
+			   "422" => "Lien invalide"
+		   ),
+		   array(
+			   "200" => "Vous pouvez désormais vous connecter à la plateforme",
+			   "422" => "Votre demande d'inscription date de plus de 24h, veuillez recommencer votre inscription"
+		   )
+	   );
+	}
+
+	/**
+	* Generates modal view based on the given error titles and messages
+	* @param $titles : array (errorCode => errorTitle)
+	* @param $messages array (errorCode => errorMessage)
+	* @return $content : modal view generated
+	*/
+	private function generateModal($titles, $messages)
+	{
+		// TODO: Voir pour ajouter les button aux paramètres
+		$content = '';
+		if (sizeof($titles) == sizeof($messages))
+		{
+			$content .=
 '<div id="submitted" class="modal modal-fixed-footer">
 	<div class="modal-content">
 
 		<!-- Different titles following type of http response -->
-		<h4 id="modal_title_200" hidden>Inscription envoyée</h4>
-		<h4 id="modal_title_409" hidden>Adresse email déjà utilisée</h4>
+		<h4 id="modal_title" hidden></h4>
 		<h4 id="modal_title_424" hidden>Une méthode de la transaction a échoué</h4>
 		<h4 id="modal_title_429" hidden>Trop de requêtes ont étés effectuées depuis votre adresse</h4>
-		<h4 id="modal_title" hidden></h4>
+		<h4 id="modal_title_err" hidden></h4>';
 
-		<div class="progress">
+		foreach ($titles as $errCode => $errTitle)
+		{
+			$content .= '
+		<h4 id="modal_title_'. $errCode .'" hidden>'. $errTitle .'</h4>';
+		}
+
+		$content .= '<div class="progress">
 			<div id="modal_progression" class="indeterminate"></div>
 		</div>
 
 		<!-- Different messages following type of http response -->
-		<p id="modal_message_err"></p>
-		<p id="modal_message_200" hidden>Veuillez vérifier vos mails et cliquer sur le lien qui vous à été envoyé.\nSi vous ne confirmer pas votre inscription dans les 24h la demande sera suprimée, vous devrez alors vous réinscrire.</p>
-		<p id="modal_message_409" hidden>Veuillez consulter vos mails pour vérifier qu\'une inscription que vous avez effectué est en attente. Toute inscription non confirmée dans les 24h sera suprimée, vous pourrez alors vous réinscire.</p>
 		<p id="modal_message_424" hidden>Quelque chose s\'est mal passé lors de la création du compte, veuillez réessayer plus tard. Si le problème persiste, contactez l\administrateur.</p>
 		<p id="modal_message_429" hidden>Veuillez patienter quelques instants avant de recommencer.</p>
-	</div>
+		<p id="modal_message_err"></p>';
+
+		foreach ($messages as $errCode => $errMessage)
+		{
+			$content .= '
+		<p id="modal_message_'. $errCode .'" hidden>'. $errMessage .'</p>';
+		}
+
+		$content .=
+'	</div>
 
 	<div class="modal-footer">
 		<a id="btn_footer_close" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
@@ -101,19 +163,21 @@ class Subscribe extends Main
 	</div>
 </div>
 ';
+		}
+		return $content;
 	}
 
 	// TODO: Changer les fonctions (retirer le get car il n'y a pas de post)
-   // FIXME: Ajouter les informations dans la base de données
    /**
    * Compute page for subscribtion validation
+   * Calls generic page generator 'generatePage'
    * @param $token : Unique token associated with the subscribtion request
+   * @return parent::generatePage
    */
    public function getPageSubscribeConfirmation($token)
    {
 	   // TODO: Rename JS File (FormConfirm => SubscribeFormValidator)
 	   // TODO: Replace default test values with blank and disable button
-	   $scripts = array('SubscribeConfirmation', 'SubscribeConfirmationValidator');
 	   $content = '
 <div class="container">
 	<div class="row">
@@ -179,18 +243,11 @@ class Subscribe extends Main
 			<i class="material-icons right">send</i>
 		</button>
 
+		'. $this->generateSubscribeConfirmationModal() .'
+
 	</div>
 </div>';
-      return parent::generatePage($content, $scripts);
-   }
-
-   /**
-   * Insert information for subscription validation
-   * @param (String)$params : data send in POST request
-   */
-   public function getPagePerishedConfirmation()
-   {
-      $content = 'Ce lien a expiré, votre inscription à eu lieu il y a plus de 24h, vous devez recommencer';
-      return parent::generatePage($content);
+      //return parent::generatePage($content, array('SubscribeConfirmation', 'SubscribeConfirmationValidator'));
+	  return parent::generatePage($content, array('Subscription', 'SubscribeConfirmationValidator'));
    }
 }
