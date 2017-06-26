@@ -36,6 +36,8 @@ CREATE TABLE Users (
 	LastName		VARCHAR(30),
 	Email			VARCHAR(30),
 	Pass			VARCHAR(50), -- TODO: Adapter à la taille du hash de sortie
+	City			VARCHAR(30),
+	Age				int(2),
 	Status 			boolean,
 	Admin			boolean,
 	PRIMARY KEY (idU),
