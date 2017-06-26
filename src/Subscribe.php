@@ -64,10 +64,19 @@ class Subscribe extends Main
 	</div>
 
 	<!-- Modal that is shown to User after submitting the form -->
-	<div id="submitted" class="modal modal-fixed-footer">
-    <div class="modal-content">
+	' . $this->subscribeModal() . '
 
-	 	<!-- Different titles following type of http response -->
+</div>';
+      return parent::generatePage($content, array('FormConfirm', 'Subscribe'));
+   }
+
+	private function subscribeModal()
+	{
+		return
+'<div id="submitted" class="modal modal-fixed-footer">
+	<div class="modal-content">
+
+		<!-- Different titles following type of http response -->
 		<h4 id="modal_title_200" hidden>Inscription envoyée</h4>
 		<h4 id="modal_title_409" hidden>Adresse email déjà utilisée</h4>
 		<h4 id="modal_title_424" hidden>Une méthode de la transaction a échoué</h4>
@@ -79,23 +88,22 @@ class Subscribe extends Main
 		</div>
 
 		<!-- Different messages following type of http response -->
-      <p id="modal_message_err"></p>
+		<p id="modal_message_err"></p>
 		<p id="modal_message_200" hidden>Veuillez vérifier vos mails et cliquer sur le lien qui vous à été envoyé.\nSi vous ne confirmer pas votre inscription dans les 24h la demande sera suprimée, vous devrez alors vous réinscrire.</p>
 		<p id="modal_message_409" hidden>Veuillez consulter vos mails pour vérifier qu\'une inscription que vous avez effectué est en attente. Toute inscription non confirmée dans les 24h sera suprimée, vous pourrez alors vous réinscire.</p>
 		<p id="modal_message_424" hidden>Quelque chose s\'est mal passé lors de la création du compte, veuillez réessayer plus tard. Si le problème persiste, contactez l\administrateur.</p>
 		<p id="modal_message_429" hidden>Veuillez patienter quelques instants avant de recommencer.</p>
-    </div>
+	</div>
 
-    <div class="modal-footer">
-	 	<a id="btn_footer_close" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
-      <a id="btn_footer_mail" target="_top" href="http://www.gmail.com" class="modal-action modal-close waves-effect waves-green btn-flat ">Open Mail</a>
-    </div>
-  </div>
+	<div class="modal-footer">
+		<a id="btn_footer_close" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+		<a id="btn_footer_mail" target="_top" href="http://www.gmail.com" class="modal-action modal-close waves-effect waves-green btn-flat ">Open Mail</a>
+	</div>
+</div>
+';
+	}
 
-</div>';
-      return parent::generatePage($content, array('FormConfirm', 'Subscribe'));
-   }
-
+	// TODO: Changer les fonctions (retirer le get car il n'y a pas de post)
    // FIXME: Ajouter les informations dans la base de données
    /**
    * Compute page for subscribtion validation
@@ -104,66 +112,70 @@ class Subscribe extends Main
    public function getPageSubscribeConfirmation($token)
    {
 	   // TODO: Rename JS File (FormConfirm => SubscribeFormValidator)
+	   // TODO: Replace default test values with blank and disable button
 	   $scripts = array('SubscribeConfirmation', 'SubscribeConfirmationValidator');
 	   $content = '
 <div class="container">
 	<div class="row">
 
-		<h3>Veuillez renseigner ces informations pour terminer votre inscription</h3>
+		<div class="row">
+			<h4>Veuillez renseigner ces informations pour terminer votre inscription</h4>
+		</div>
 
-		<div class="row" id="letest">
+		<div class="row">
 			<div class="col validator">
-				<input class="indeterminate-checkbox" id="first_name_status" type="checkbox" />
+				<input class="indeterminate-checkbox valign-wrapper" id="first_name_status" type="checkbox" tabindex="-1" />
 				<label class="empty_label"></label>
 			</div>
 
 			<div class="input-field col s6">
-		        <input id="first_name" type="text" class="confirmation" autofocus>
-		        <label for="first_name">First Name</label>
+		        <input id="first_name" type="text" class="confirmation" placeholder="Saisissez votre prénom" value="Maxime" autofocus>
+		        <label for="first_name"><p class="required_flag">*</p> Prénom</label>
 	        </div>
 		</div>
 
 		<div class="row">
 			<div class="col">
-				<input type="checkbox" class="indeterminate-checkbox" id="last_name_status"/>
+				<input type="checkbox" class="indeterminate-checkbox" id="last_name_status" tabindex="-1"/>
 				<label class="empty_label"></label>
 			</div>
 
 	  		<div class="input-field col s6">
-				<input id="last_name" type="text" class="confirmation" required>
-				<label for="last_name">Last Name</label>
+				<input id="last_name" type="text" class="confirmation" placeholder="Saisissez votre nom" value="Dolet">
+				<label for="last_name"><p class="required_flag">*</p> Nom</label>
 	        </div>
 		</div>
 
 		<div class="row">
 			<div class="col">
-				<input type="checkbox" class="indeterminate-checkbox" id="city_status"/>
+				<input type="checkbox" class="indeterminate-checkbox" id="city_status" tabindex="-1" />
 				<label class="empty_label"></label>
 			</div>
 
 			<div class="input-field col s6">
-			  	<select id="city" required="required">
-				  <option value="" selected disabled>Choisissez votre ville</option>
-				  <option value="1">Liège</option>
-				  <option value="2">Nancy</option>
+			  	<select id="city">
+					<option value="" disabled >Choisissez une ville</option>
+					<option value="1" selected>Liège</option>
+					<option value="2" >Nancy</option>
 			  	</select>
+				<label for="city"><p class="required_flag">*</p> Ville d\'étude</label>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="col">
-				<input type="checkbox" class="indeterminate-checkbox" id="age_status" />
+				<input type="checkbox" class="indeterminate-checkbox" id="age_status" tabindex="-1" />
 				<label class="empty_label"></label>
 			</div>
 
 	    	<div class="input-field col s6">
-	            <input id="age" type="number" class="confirmation">
-	            <label for="age">Age</label>
+	            <input id="age" type="number" class="confirmation" max="100", min="1" value="21" placeholder="Saisissez votre age">
+	            <label for="age"><p class="required_flag">*</p> Age</label>
 	        </div>
 		</div>
 
 
-		<button id="send" class="btn waves-effect waves-light disabled" type="submit" onclick="confirmSubscription(\''.$token.'\')">Envoyer
+		<button id="send" class="btn waves-effect waves-light" type="submit" onclick="confirmSubscription(\''.$token.'\')">Envoyer
 			<i class="material-icons right">send</i>
 		</button>
 

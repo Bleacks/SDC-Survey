@@ -1,4 +1,4 @@
-// At least 1 letter AND (1 number OR spec char) AND length > 5
+// At least 1 letter AND 1 number AND length > 5
 $(document).ready(function() {
 
 	// TODO: message d'erreur pour le mot de passe et mail à revoir
@@ -9,7 +9,6 @@ $(document).ready(function() {
     var regex_pass = new RegExp("^[A-Za-z0-9,;:!\/\*$&-+]{5,25}$");
 	var regex_pass2 = new RegExp("^.*[0-9].*$");
 	var regex_mail = new RegExp('^([\\w\\-\\._]+\\@[\\w\\-_]+\\.[\\w\\-\\._]+)$');
-	console.log(regex_mail);
 	// TODO: °Voir avec Xaviera si on utilise les mails étudiants (mieux) ^[\w-._]+\@(etu\.)?univ-lorraine\.fr
 
 	// FIXME: Retirer les init de valid pour la mise en production
@@ -64,7 +63,7 @@ $(document).ready(function() {
 
     function clean(e) {
 		if (e.val() == '') {
-		   e.removeClass("invalid").removeClass("valid").addClass('validate');
+		   e.removeClass("invalid").removeClass("valid");
 			e.isValid = false;
 		}
     }
@@ -100,13 +99,13 @@ $(document).ready(function() {
 	 }
 
     function invalidInput(e) {
-		e.removeClass('valid').removeClass('validate').addClass('invalid');
+		e.removeClass('valid').addClass('invalid');
 		e.isValid = false;
 		verifyButton();
     }
 
     function validInput (e) {
-    	e.removeClass('invalid').removeClass('validate').addClass('valid');
+    	e.removeClass('invalid').addClass('valid');
 		e.isValid = true;
 		verifyButton();
     }

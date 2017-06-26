@@ -1,5 +1,19 @@
 <?php
 
+/* HTTP codes sent by this platform
+
+200 : Success
+
+404 : Not found
+405 : Method not allowed
+409 : Conflict
+422 : Unprocessable entry
+424 : Method failure
+429 : Too many request
+
+500 : Internal server error
+*/
+
 // TODO: Ajouter un champ Licence dans le composer.json
 require_once "vendor/autoload.php";
 
@@ -41,7 +55,7 @@ $app->get('/Profile/{num}', function (ServerRequestInterface $request, ResponseI
 
 $app->get('/Messages', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-	MailManager::testMailer();
+	//MailManager::testMailer();
 	return Main::workInProgressPage();
 });
 
@@ -76,27 +90,59 @@ $app->post('/Subscribe', function(ServerRequestInterface $request, ResponseInter
 
 $app->get('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
 {
-	// TODO: Remettre en forme les accolades de ce fichier
-	$subscribe = new Subscribe();
-	$db = Database::getInstance();
-	$token = $args['token'];
-	$regex = '/^[a-zA-Z0-9]{10}$/i';
-
 	// TODO: Ajouter une modale avec crécupéreation des données du serveur et en cas de non validité afficher l'erreur dedans, la fermer sinon et permettre l'inscription
 	// TODO: Ajouter une suppression des tokens on register confirm
 
-	if (preg_match($regex, $token))
+	$token = $args['token'];
+
+	if (preg_match('/^[a-zA-Z0-9]{10}$/i', $token))
 	{
-		if ($db->verifyToken($token))
+		$subscribe = new Subscribe();
+		$db = Database::getInstance();
+
+		$pendingSub = $db->getPendingSubscription($token);
+		if ($db->verifyToken($pendingSub))
 		{
 			$res = $subscribe->getPageSubscribeConfirmation($token);
 		} else {
-			$res = $subscribe->getPagePerishedConfirmation($token);
+			$res = $subscribe->getPagePerishedConfirmation();
+			$db->deletePendingSubscription($pendingSub);
 		}
 	} else {
 		$res = $response->withStatus(422);
 	}
 
+    return $res;
+});
+
+$app->post('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
+{
+	$token = $args['token'];
+	$res = $response->withStatus(422);
+
+	if (preg_match('/^[a-zA-Z0-9]{10}$/i', $token))
+	{
+		$subscribe = new Subscribe();
+		$db = Database::getInstance();
+		$pendingSub = $db->getPendingSubscription($token);
+		if ($pendingSub != false)
+		{
+			$post = $request->getParsedBody();
+
+			if ($db->verifyToken($pendingSub))
+			{
+				if (isset($post['first_name']) && isset($post['last_name']) &&
+					isset($post['city']) && isset($post['age']))
+				{
+					if ($db->confirmUser($pendingSub, $post['first_name'], $post['last_name'], $post['city'], $post['age']))
+						$res = $response->withStatus(200);
+					else
+						$res = $response->withStatus(424);
+				}
+			}
+		} else
+			$res = $response->withStatus(424);
+	}
     return $res;
 });
 
