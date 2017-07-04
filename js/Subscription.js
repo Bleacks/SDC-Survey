@@ -58,7 +58,7 @@ function feedback(response) {
 	$('#modal_title_' + status).show();
 	$('#modal_message_' + status).show();
 }
-
+// FIXME: Patch la progress bar après envoi
 function sendAjax(targetUrl, jsonData) {
 	$.ajax({
 		url        : targetUrl,
