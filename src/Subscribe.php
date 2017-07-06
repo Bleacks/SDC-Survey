@@ -24,6 +24,9 @@ class Subscribe extends Main
 	/**
 	* Computes content of the page displayed when GET request on /Subscribe
 	*/
+	// TODO: Rename all generate with GET
+	// FIXME: Patch de la Modal en cas d'erreur puis réenvoi
+	// FIXME: Patch la progressBar
    public function getPageSubscribe()
    {
 		// TODO: Restore class from valid to validate in release mode and put back disabled button
@@ -42,22 +45,22 @@ class Subscribe extends Main
 
 			<div class="row">
 				<div class="input-field col s12">
-					<input name="email" id="email" type="email" class="validate"  value="" autofocus>
-					<label class="required" for="email" data-error="Email not valid (example@sdc.com)" data-success="Email valid"><p class="required_flag">*</p> Email</label>
+					<input name="email" id="email" type="email" class="validate"  value="this.is@a.test" autofocus>
+					<label class="required" for="email" data-error="Adresse email invalide (example@sdc.com)" data-success="Adresse email valide"><p class="required_flag">*</p> Email</label>
 				</div>
 		   </div>
 
 			<div class="row">
 				<div class="input-field col s12">
-					<input id="password" type="password" class="required validate" value="">
-					<label class="required" for="password" data-error="Password must be 5 chars length" data-success="Valid password"><p class="required_flag">*</p> Password</label>
+					<input id="password" type="password" class="required validate" value="azer1">
+					<label class="required" for="password" data-error="Mot de passe invalide (longueur minimale 5 caractères, doit contenir 1 chiffre" data-success="Mot de passe valide"><p class="required_flag">*</p> Password</label>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="input-field col s12">
-					<input id="password_confirm" type="password" class="required validate" value="">
-					<label class="required" for="password_confirm" data-error="Password not match" data-success="Password Match"><p class="required_flag">*</p> Confirm Password</label>
+					<input id="password_confirm" type="password" class="required validate" value="azer1">
+					<label class="required" for="password_confirm" data-error="Les mots de passes ne correspondent pas" data-success="Les mots de passe correspondent bien"><p class="required_flag">*</p> Confirm Password</label>
 				</div>
 			</div>
 

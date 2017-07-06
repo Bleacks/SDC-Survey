@@ -16,6 +16,12 @@ $(document).ready(function() {
 	conf.isValid = true;
 	mail.isValid = true;
 
+	// NOTE: Supprimer les verify qui suivent pour la mise en production
+	verifyButton();
+	verifyMail();
+	verifyPass();
+	verifyConf();
+
 	mail.on("input", function(e) {
 		verifyMail();
 	});
@@ -109,13 +115,12 @@ $(document).ready(function() {
 		e.isValid = true;
 		verifyButton();
     }
-	$('#send').on("keyup keypress", function(event) {
+	$(window).on("keyup", function(event) {
 		var keyCode = event.keyCode || event.which;
-		if (keyCode == 13)
+		if (keyCode == 13 && $('#send').hasClass('disabled'))
 			createAccount();
 	});
-   
-   // TODO: Ajouter des tooltips sur tous les champs du formulaire :focus
+// TODO: Add tooltips on hover for each fields of the form, displaying validation condition
    /*
    $('.tooltipped').on("focusin", function(){
    		$('.tooltipped').tooltip().show();

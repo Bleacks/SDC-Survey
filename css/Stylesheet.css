@@ -1,0 +1,42 @@
+/*
+CSS File that comes in addition of Materialize
+*/
+
+/* Used to keep footer at bottom of the page */
+body {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+}
+
+main {
+	/* Used to keep footer at bottom of the page */
+	flex: 1 0 auto;
+	/* Notification slide down without pushing content */
+	margin-top: 80px;
+}
+
+/* Used to set width of data-succes and data-error of inputs */
+label {
+	width: 100%;
+}
+
+/* Coloring asterisk in red for required form fields */
+.required_flag {
+	color: red;
+	display: inline;
+}
+
+/* Required label for the checkboxes to appear (trying to push them down)
+// TODO: Décaler les checkboxes vers le bas avec le texte */
+.empty_label {
+	padding-top 20%;
+}
+
+#notification {
+	position: absolute;
+	width: 100%;
+	color: white;
+	text-align:center;
+	font-size: 120%;
+}

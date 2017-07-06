@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS Answer;
 DROP TABLE IF EXISTS AnsweredSurvey;
 DROP TABLE IF EXISTS OtherAnswer;
 DROP TABLE IF EXISTS PendingSub;
+DROP TABLE IF EXISTS Token;
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Groups;
 DROP TABLE IF EXISTS Question;
@@ -43,6 +44,15 @@ CREATE TABLE Users (
 	PRIMARY KEY (idU),
 	CONSTRAINT fk_users_idg FOREIGN KEY (idG)
 	REFERENCES Groups(idG)
+);
+
+CREATE TABLE Token (
+	idT				VARCHAR(25),
+	idU				int(6),
+	lastUsed		Datetime,
+	PRIMARY KEY (idT),
+	CONSTRAINT fk_users_idu FOREIGN KEY (idU)
+	REFERENCES Users(idU)
 );
 
 CREATE TABLE Answer (

@@ -18,26 +18,36 @@ class Main
    }
 
    /**
-   * Generate header of pages
-   * @return (String):Computed header
+   * Creates generic header
+   * @return $header Computed header
    */
-   private function header()
-   {
-      // TODO: Rediriger les href du header
-      return '
+	private function header()
+	{
+		// TODO: Rediriger les href du header
+		$header = '
 <header>
 	<nav>
     	<div class="nav-wrapper">
       		<a href="Accueil" class="brand-logo">SDC-Survey</a>
-			<ul id="nav-mobile" class="right hide-on-med-and-down">
-				<li><a href="Home">Home</a></li>
-				<li><a href="Profile/54">Profile</a></li>
-				<li><a href="Messages">Messages</a></li>
-				<li><a href="Settings">Settings</a></li>
+			<ul id="nav-mobile" class="right hide-on-med-and-down">';
+		if (isset($_SESSION['token']))
+      	$header .= '
+				<li><a href="Home">Accueil</a></li>
+				<li><a href="Demo">Démo</a></li>
+				<li><a href="Deco">Déconnexion</a></li>';
+		else
+			$header .= '
+				<li><a href="Connect">Connexion</a></li>
+				<li><a href="Subscribe">Inscription</a></li>';
+		$header .= '
 			</ul>
 		</div>
 	</nav>
+	<div id="notification" class="row red" hidden>
+		<p id="notification_text"><p>
+	</div>
 </header>';
+		return $header;
    }
 
    /**
@@ -120,7 +130,7 @@ class Main
 		       <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
 		       <!--Import Google Icon Font-->
-		       <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 			   <!--Import materialize.css-->
 			   <link type="text/css" rel="stylesheet" href="materialize/css/materialize.min.css" media="screen,projection">
@@ -151,12 +161,38 @@ class Main
 		 </html>';
    }
 
+
+   	/**
+   	* Generates submit button for subscription forms
+   	* @param $onclickHandler : JS Function called when this button is clicked
+   	* @return : Button with given handler
+   	*/
+   	protected function getButton($onclickHandler)
+   	{
+   	return '
+   	<button id="send" class="btn waves-effect waves-light disabled" type="submit" onclick="'.$onclickHandler.'">Envoyer
+   		<i class="material-icons right">send</i>
+   	</button>
+   	<div>
+   		<label><p class="required_flag">*</p> Champs obligatoires</label>
+   	</div>';
+   	}
+
    /**
    * Send error log to Apache, factoring error context in one method
    * @param (String)$message : Error message
    */
-   private function logError($message)
+   public function logError($message)
    {
       error_log('Error creating Main.php : ' . $message);
    }
+
+	/**
+	* Creates a default page to notify end-user that content is currently unavailable dues to modifications
+	*/
+	public static function workInProgressPage()
+	{
+		$main = new Main();
+		return $main->generatePage('Work in progress');
+	}
 }

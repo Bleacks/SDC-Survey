@@ -36,7 +36,8 @@ class Database
 			'OtherSurvey'		=> array('idQ', 'idU'),
 			'Users'				=> 'idU',
 			'PendingSub'		=> 'Token',
-			'Groups'			=> 'idG'
+			'Groups'			=> 'idG',
+			'Token'				=> 'idT'
 		));
 	}
 
@@ -63,18 +64,12 @@ class Database
 		$user = ORM::forTable('Users')->create();
 
 		$user->Email = $email;
-		$user->Pass = $password;
+		$user->Pass = password_hash($password, PASSWORD_BCRYPT);
 		$res = $user->save();
 
 		$sub = ORM::forTable('PendingSub')->create();
 
-		$alphabet = 'azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789';
-		$token = '';
-		for ($i = 0; $i < 10; $i++)
-		{
-		  $token .= $alphabet[rand(0,61)];
-		}
-		$sub->Token = $token;
+		$sub->Token = $this->generateToken(10);
 		$sub->idU = $user->id();
 		$sub->set_expr('SubscribedAt', 'NOW()');
 
@@ -82,18 +77,42 @@ class Database
 	}
 
 	/**
-	* Confirms Subscription by completing given pendingSub's user with given info
+	* Generates random string of the given length from a 62 chars alphabet
+	* @param $stringLength Length of the returned random string
+	* @return $string Random string
 	*/
-	public function confirmUser($pendingSub, $first_name, $last_name, $city, $age)
+	private function generateToken($stringLength)
+	{
+		$alphabet = 'azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789';
+		$string = '';
+		for ($i = 0; $i < $stringLength; $i++)
+		{
+			$string .= $alphabet[rand(0,61)];
+	  	}
+		return $string;
+	}
+
+	/**
+	* Confirms Subscription by completing given pendingSub's user with given info
+	* @param $pendingSub Pending subscription
+	* @param $firstName First name of the user associated with the
+	* @param $lastName Last name of the user
+	* @param $city City of the user
+	* @param $age
+	*/
+	public function confirmUser($pendingSub, $FirstName, $lastName, $city, $age)
 	{
 		$user = ORM::forTable('Users')->select('idU')->findOne($pendingSub->idU);
 
-		$user->FirstName = $first_name;
-		$user->LastName = $last_name;
+		$user->FirstName = $FirstName;
+		$user->LastName = $lastName;
 		$user->City = $city;
 		$user->Age = $age;
 
-		return $user->save() && $pendingSub->delete();
+		$code = $user->save();
+		if ($code)
+			$code = $code; //&& $pendingSub->delete();
+		return $code;
 	}
 
 	/**
@@ -120,22 +139,65 @@ class Database
 
 	/**
 	* Verifies if given token is still valid (i.e. created in the last 24h)
-	* @param $token Subscription token associated to the user
+	* @param $subscriptionToken Subscription token associated to the user
 	* @return $isValid True if given token is still valid
 	*/
-	public function verifyToken($pendingSub)
+	// FIXME: Rename en verifySubscriptionToken
+	public function verifyToken($subscriptionToken)
 	{
-		$date = new DateTime($pendingSub->SubscribedAt, new DateTimeZone("Europe/Paris"));
+		$date = new DateTime($subscriptionToken->SubscribedAt, new DateTimeZone("Europe/Paris"));
 		$now = new DateTime("now", new DateTimeZone("Europe/Paris"));
 		return $isValid = $now->diff($date)->days == 0;
 	}
 
 	/**
 	* Deletes the given pending subscription and the user's info that are associated to it
+	* @param $pendingSub Pending subscription's token
+	* @return delete() True if row are successfully deleted
 	*/
 	public function deletePerishedSubscription($pendingSub)
 	{
 		$user = ORM::forTable('Users')->findOne($pendingSub->idU);
-		return $user->delete() && $pendingSub->delete();
+		return $pendingSub->delete() && $user->delete();
+	}
+
+	/**
+	* Verifies that the given token is still valid (i.e. created or refreshed in the last 7 days)
+	* @param $connectionToken Token used to authenticate instead of credentials
+	* @return $connection True if the given token is still valid
+	*/
+	public function verifyConnectionToken($connectionToken, $userId)
+	{
+		$connection = ORM::forTable('Token')->where('idU', $userId)->findOne();
+		return $connection != false;
+	}
+
+	/**
+	* Creates a connection token for the given user
+	* @param $user User associated to the created token
+	* @return $token Token generated (false in case of error)
+	*/
+	public function createConnectionToken($user)
+	{
+		// TODO: Chiffrement de l'email avec sel
+		$token = $this->generateToken(25);
+		// TODO: Factoriser la création du sel avec le token d'inscription
+		// Ajout du token à la BDD
+		$connectionToken = ORM::forTable('Token')->create();
+		$connectionToken->idT = $token;
+		$connectionToken->idU = $user->idU;
+		$connectionToken->set_expr('lastUsed', 'NOW()');
+
+		return ($connectionToken->save()) ? $token : false;
+	}
+
+	/**
+	* Deletes given connection token
+	* @param $token Token to delete
+	* @return delete()
+	*/
+	public function deleteConnectionToken($token)
+	{
+		return ORM::forTable('Token')->findOne($token)->delete();
 	}
 }
