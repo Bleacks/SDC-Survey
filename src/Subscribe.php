@@ -10,23 +10,19 @@ class Subscribe extends Main
 
    public function __construct()
    {
-      // TODO: Ajouter un date picker pour la naissance
+      // NOTE: Ajouter un date picker pour la naissance ?
       // TODO: Ajouter un champ pour uploader une image lors de la confirmation d'inscription
-      // TODO: Découper l'inscription en deux étapes comme dans la maquette
-      // TODO: Ajouter un validateur de champs pour l'inscription, la connexion et les paramètres
+      // TODO: Ajouter un validateur de champs pour les paramètres
       // TODO: Utiliser Faker pour générer de fausses données à envoyer à la BDD
       // TODO: Regarder pour utiliser Upload pour l'envoi de données
       // TODO: Finir les regex de validation
-      // TODO: Ajouter des regex sur les form d'inscription et connexion
-	  // TODO: Tester le bon fonctionnement de la méthode de suppression des token périmés
    }
 
+   // TODO: Rename all generate with GET
 	/**
-	* Computes content of the page displayed when GET request on /Subscribe
+	* Generates HTML content of the page displayed when GET request on /Subscribe
+	* @return string Subscribe's HTML code
 	*/
-	// TODO: Rename all generate with GET
-	// FIXME: Patch de la Modal en cas d'erreur puis réenvoi
-	// FIXME: Patch la progressBar
    public function getPageSubscribe()
    {
 		// TODO: Restore class from valid to validate in release mode and put back disabled button
@@ -70,7 +66,7 @@ class Subscribe extends Main
 		</div>
 
 		<!-- Modal that is shown to User after submitting the form -->
-		' . $this->generateSubscribeModal() . '
+		' . $this->getSubscribeModal() . '
 	</div>
 </div>';
       //return parent::generatePage($content, array('FormConfirm', 'Subscribe'));
@@ -79,10 +75,10 @@ class Subscribe extends Main
 
 	/**
 	* Generates modal view displayed after submit button is clicked on 'Subscribe'
-	* Calls generic modal creator 'generateModal'
-	* @return $this->generateModal : generated modal
+	* Calls generic modal creator 'generateModal' to create subsciption specific modal
+	* @return string Subscription Modal's HTML code
 	*/
-	private function generateSubscribeModal()
+	private function getSubscribeModal()
 	{
 	   return $this->generateModal(
 		   array(
@@ -96,13 +92,12 @@ class Subscribe extends Main
 	   );
 	}
 
-
 	/**
 	* Generates modal view displayed after submit button is clicked on 'Subscribe/[token]'
-	* Calls generic modal creator 'generateModal'
-	* @return $this->generateModal : generate modal
+	* Calls generic modal creator 'generateModal' to create subsciption confirmation specific modal
+	* @return string Subscription confirmation Modal's HTML code
 	*/
-	private function generateSubscribeConfirmationModal()
+	private function getSubscribeConfirmationModal()
 	{
 	   // TODO: Ajouter un lien pour se connecter en cliquant ici dans le message de succes
 	   // TODO: Ajouter un lien pour s'inscrire directement dans le message d'erreur
@@ -119,10 +114,10 @@ class Subscribe extends Main
 	}
 
 	/**
-	* Generates modal view based on the given error titles and messages
-	* @param $titles : array (errorCode => errorTitle)
-	* @param $messages array (errorCode => errorMessage)
-	* @return $content : modal view generated
+	* Generic function that generates HTML code for Modal view, base on given parameters
+	* @param array(errorCode => errorTitle) $titles Titles for differents error codes
+	* @param array(errorCode => errorMessage) $messages Messages for differents error codes
+	* @return string Generated modal view HTML code based on given params
 	*/
 	private function generateModal($titles, $messages)
 	{
@@ -176,10 +171,10 @@ class Subscribe extends Main
 
 	// TODO: Changer les fonctions (retirer le get car il n'y a pas de post)
    /**
-   * Compute page for subscribtion validation
+   * Compute page for GET request on subscribtion validation
    * Calls generic page generator 'generatePage'
-   * @param $token : Unique token associated with the subscribtion request
-   * @return parent::generatePage
+   * @param string $token : Unique token associated with the subscribtion request
+   * @return string Subscribe's HTML code
    */
    public function getPageSubscribeConfirmation($token)
    {
@@ -250,11 +245,10 @@ class Subscribe extends Main
 		parent::getButton('confirmSubscription(\''.$token.'\')')
 		.'
 
-		'. $this->generateSubscribeConfirmationModal() .'
+		'. $this->getSubscribeConfirmationModal() .'
 
 	</div>
 </div>';
-      //return parent::generatePage($content, array('SubscribeConfirmation', 'SubscribeConfirmationValidator'));
 	  return parent::generatePage($content, array('Subscription', 'SubscribeConfirmationValidator'));
    }
 }

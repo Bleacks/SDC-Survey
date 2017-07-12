@@ -4,6 +4,10 @@ Namespace Src;
 
 /**
 * Class used to wrap all connection page creation related methods
+*
+* Creates connection form page
+*
+* @method string getPageConnect()
 */
 class Connect extends Main {
 
@@ -13,8 +17,8 @@ class Connect extends Main {
 	}
 
 	/**
-	* Generates content of the connect page
-	* @return $content HTML body of the connect page
+	* Generates HTML content of the page displayed when GET request on Connect
+	* @return string Connect's HTML code
 	*/
 	public function getPageConnect()
 	{
@@ -52,6 +56,6 @@ class Connect extends Main {
 		</div>
 	</div>
 </div>';
-		return parent::generatePage($content, array('Connection', 'ConnectionConfirmation'));
+		return parent::generatePage($content, array('Connection'));
 	}
 }

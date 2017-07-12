@@ -49,7 +49,7 @@ $(document).ready(function() {
 			$('#send').addClass('disabled');
 	}
 
-	// Disable on click actions for checkboxes as they're only used to inform field validation
+	/** Disable on click actions for checkboxes as they're only used to inform field validation */
 	$('.indeterminate-checkbox').on('click',function() {
 		$(this).prop('checked', false);
 		if ($(this).prop('checked')) {

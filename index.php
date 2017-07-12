@@ -50,6 +50,8 @@ session_start();
 
 // TODO: Change middleware, apply it to group instead of filtering url
 // FIXME: Ajouter un filtre pour éviter de demander l'accès pour une page qui n'existe pas ou n'en necessite pas
+
+
 $app->add(
 	function(ServerRequestInterface $request, ResponseInterface $response, Callable $next) {
 		$url = $request->getUri()->getPath();
@@ -64,20 +66,24 @@ $app->add(
 			$needsAuth = !($url == 'Connect' || $url == 'Subscribe');
 		}
 
-		if ($needsAuth && !isset($_SESSION['token'])) // Utilisateur non connecté
+		if ($needsAuth)
 		{
-			$_SESSION['url'] = $url;
+			// Requested page needs authentication to be accessed
 			$db = Database::getInstance();
-			// TODO: Créer la table Token
-			// TODO: Ajouter un token quand on coche la case "Remember me"
-			if (!$db->verifyConnectionToken($_SESSION['token']))
+			if (!isset($_SESSION['token']) || !$db->verifyConnectionToken($_SESSION['token']))
+			{
+				// User not connected
+				$_SESSION['url'] = $url;
 				return $response = $response->withRedirect('Connect', 403);
+			}
 		}
 		return $next($request, $response);
 	}
 );
 
 // NOTE: Main ne doit être utilisée que par les classes spécifiques, vers lesquelles Slim redirige
+
+
 
 $app->get('/Home', function (ServerRequestInterface $request, ResponseInterface $response)
 {
@@ -87,8 +93,10 @@ $app->get('/Home', function (ServerRequestInterface $request, ResponseInterface 
 	$res = $res->withJson(var_dump($hash));
 	$res = $res->withJson(var_dump(password_verify('mot de pass', $hash)));
 	*/
+	// FIXME: Write test for the dateDiffNow function
 	return Main::workInProgressPage();
 });
+
 
 $app->get('/Demo', function (ServerRequestInterface $request, ResponseInterface $response)
 {
@@ -96,11 +104,15 @@ $app->get('/Demo', function (ServerRequestInterface $request, ResponseInterface 
    return $main->generateDemo();
 });
 
+
+
 $app->get('/Profile/{num}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
 {
     #return 'Profil numéro '.$args['num'];
     return Main::workInProgressPage();
 });
+
+
 
 $app->get('/Connect', function (ServerRequestInterface $request, ResponseInterface $response)
 {
@@ -114,6 +126,8 @@ $app->get('/Connect', function (ServerRequestInterface $request, ResponseInterfa
 		return $con->getPageConnect();
 	}
 })->setName('auth');
+
+
 
 $app->post('/Connect', function (ServerRequestInterface $request, ResponseInterface $response)
 {
@@ -162,22 +176,30 @@ $app->post('/Connect', function (ServerRequestInterface $request, ResponseInterf
 	return $res;
 });
 
+
+
 $app->get('/Messages', function (ServerRequestInterface $request, ResponseInterface $response)
 {
 	//MailManager::testMailer();
 	return Main::workInProgressPage();
 });
 
+
+
 $app->get('/Test', function (ServerRequestInterface $request, ResponseInterface $response)
 {
 	return Main::workInProgressPage();
 });
+
+
 
 $app->get('/Subscribe', function (ServerRequestInterface $request, ResponseInterface $response)
 {
    $subscribe = new Subscribe();
    return $subscribe->getPageSubscribe();
 });
+
+
 
 $app->post('/Subscribe', function(ServerRequestInterface $request, ResponseInterface $response)
 {
@@ -197,6 +219,8 @@ $app->post('/Subscribe', function(ServerRequestInterface $request, ResponseInter
    	return $res;
 });
 
+
+
 $app->get('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
 {
 	// TODO: Ajouter une modale avec crécupéreation des données du serveur et en cas de non validité afficher l'erreur dedans, la fermer sinon et permettre l'inscription
@@ -210,7 +234,7 @@ $app->get('/Subscribe/{token}', function (ServerRequestInterface $request, Respo
 		$db = Database::getInstance();
 
 		$pendingSub = $db->getPendingSubscription($token);
-		if ($db->verifyToken($pendingSub))
+		if ($db->verifySubscriptionToken($pendingSub))
 		{
 			$res = $subscribe->getPageSubscribeConfirmation($token);
 		} else {
@@ -223,6 +247,8 @@ $app->get('/Subscribe/{token}', function (ServerRequestInterface $request, Respo
 
     return $res;
 });
+
+
 
 $app->post('/Subscribe/{token}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
 {
@@ -238,7 +264,7 @@ $app->post('/Subscribe/{token}', function (ServerRequestInterface $request, Resp
 		{
 			$post = $request->getParsedBody();
 
-			if ($db->verifyToken($pendingSub))
+			if ($db->verifySubscriptionToken($pendingSub))
 			{
 				if (isset($post['first_name']) && isset($post['last_name']) &&
 					isset($post['city']) && isset($post['age']))
@@ -255,20 +281,29 @@ $app->post('/Subscribe/{token}', function (ServerRequestInterface $request, Resp
     return $res;
 });
 
+
+
 $app->get('/Login', function (ServerRequestInterface $request, ResponseInterface $response)
 {
 	return Main::workInProgressPage();
 });
 
+
+
 $app->get('/Deco', function (ServerRequestInterface $request, ResponseInterface $response)
 {
+	if (isset($_SESSION['token']))
+	{
+		$db = Database::getInstance();
+		$db->deleteConnectionToken($_SESSION['token']);
+	}
 	session_unset();
 	session_destroy();
 	sleep(1);
 	return $response->withRedirect('Connect');
-	// FIXME: Redirect to Connect page
-	//return Main::workInProgressPage();
 });
+
+
 
 $app->run();
 

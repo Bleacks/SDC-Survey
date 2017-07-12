@@ -3,10 +3,26 @@
 namespace Src;
 
 /**
-* Class used to create Page base
+* Class used to create generic Page wrapper
+*
+* Generates generic header, footer and main container wrapper to use in all child classes
+*
+* Every Class that has to generate pages and return HTML code should extend this Class and use parent method used to create generic wrapper
+*
+* @method string header()
+* @method string main()
+* @method string footer()
+* @method string generatePage($content, $scripts = aaray())
+* @method string generateButton($onClickHandler)
 */
 class Main
 {
+
+	/** Color displayed on main elements (Primary color as Material Design describes it) */
+	const PRIMARY_COLOR = 'teal lighten-1';
+
+	/** Color displayed on secondary elements  (secondary color as Material Design describes it) */
+	const SECONDARY_COLOR = 'red';
 
    /**
    * Constructor of the Main Class
@@ -26,25 +42,26 @@ class Main
 		// TODO: Rediriger les href du header
 		$header = '
 <header>
-	<nav>
+	<nav class="'.Main::PRIMARY_COLOR.'">
     	<div class="nav-wrapper">
       		<a href="Accueil" class="brand-logo">SDC-Survey</a>
 			<ul id="nav-mobile" class="right hide-on-med-and-down">';
 		if (isset($_SESSION['token']))
-      	$header .= '
-				<li><a href="Home">Accueil</a></li>
-				<li><a href="Demo">Démo</a></li>
-				<li><a href="Deco">Déconnexion</a></li>';
+      		$header .= '
+				<li><a class="flow-text" href="Home">Accueil</a></li>
+				<li><a class="flow-text" href="Demo">Démo</a></li>
+				<li><a class="flow-text" href="Deco">Déconnexion</a></li>';
 		else
 			$header .= '
-				<li><a href="Connect">Connexion</a></li>
-				<li><a href="Subscribe">Inscription</a></li>';
+				<li><a class="flow-text" href="Connect">Connexion</a></li>
+				<li><a class="flow-text" href="Subscribe">Inscription</a></li>';
 		$header .= '
 			</ul>
 		</div>
 	</nav>
-	<div id="notification" class="row red" hidden>
-		<p id="notification_text"><p>
+
+	<div id="notification" class="red z-depth-2" hidden>
+		<p id="notification_text" class="white-text center-align flow-text"><p>
 	</div>
 </header>';
 		return $header;
@@ -70,14 +87,14 @@ class Main
    */
    private function footer()
    {
-      // TODO: Ajouter les liens vers les autres pages
+      // TODO: Complete footer informations
       // TODO: Ajouter une description
       return '
-<footer class="page-footer">
+<footer class="page-footer '.Main::PRIMARY_COLOR.'">
 	<div class="container">
     	<div class="row">
 			<div class="col l6 s12">
-				<h5 class="white-text">SDC-Survey Web Platform</h5>
+				<h5 class="flow-text white-text">SDC-Survey Web Platform</h5>
 				<p class="grey-text text-lighten-4">Desciption</p>
 			</div>
 

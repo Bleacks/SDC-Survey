@@ -1,13 +1,20 @@
+// Using IIFE to wrap content and "privatize" gobals var
 functions = (function()
 {
 	var mail = '';
 	var pass = '';
 
 	return [
+		/**
+		* Gather form's data and send it to the server using Ajax request
+		* Also handling errors that server could send back and push them to notification pane
+		*/
 		function connectUser()
 		{
-			mail = $('#email').val().toLowerCase();
-			pass = $('#password').val();
+			var mail = $('#email').val().toLowerCase();
+			var pass = $('#password').val();
+			var displayed = false;
+
 
 			var jsonData = {
 				"email": mail,
@@ -24,35 +31,45 @@ functions = (function()
 				complete   : function (response)
 				{
 					//$('main').append(response.responseText);
-					$('#notification').slideUp("fast")
+					var notification = $('#notification');
+					notification.slideUp("fast");
 					var location = 'Home';
 					if (response.responseText != '')
 					{
 						var json = JSON.parse(response.responseText);
 						if (json.hasOwnProperty('url'))
 						{
-							console.log(json['url']);
 							location = json['url'];
 						}
-						// FIXME: Ajouter une exception pour les différentes erreurs dans une fonction générique
 					}
-					if (response.status == 200)
+					switch (response.status)
 					{
-						window.location = location;
-					} else
-					{
-						$('#notification_text').text('Combinaison Email/Mot de passe inexistante')
-						$('#notification').slideDown("slow", function()
-						{
-							// TODO: Changer la couleur des champs
-							verifyFields();
-						});
+						case 200:
+							window.location = location;
+							break;
+
+						case 422:	// TODO: Change notification's color and bring shawdow to it
+							message = 'Combinaison Email/Mot de passe inexistante';
+							notification.slideDown("slow", verifyFields);
+							break;
+
+						case 500:
+							message = 'Une erreur s\'est produite';
+							break;
+
+						default:
+							message = 'Unhandled exception';
+							break;
 					}
+					$('#notification_text').text(message);
 				}
 			});
 
 		},
 
+		/**
+		* Used to unvalid form when error is received and also to valid it back when changes are made
+		*/
 		function verifyFields()
 		{
 			var password = $('#password').val();
@@ -68,12 +85,18 @@ functions = (function()
 			}
 		},
 
+		/**
+		* Used to initialize form behavior and validation
+		*/
 		function onDocumentReady()
 		{
 			verifyFields(); // TODO: Vérifier que tous les formulaires ont un verify dès le début et sont disabled de base
 			$('.required').on('keyup', verifyFields);
 		},
-		
+
+		/**
+		* Used to allow user to submit form using Enter key
+		*/
 		function onKeyUp(event)
 		{
 			var keyCode = event.keyCode || event.which;
