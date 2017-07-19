@@ -143,7 +143,7 @@ class Main
 		 <html>
 		    <head>
 		       <!--Initialize environment-->
-		       <base href="/bleacks/SDC-Survey/" />
+		       <base href="/SDC-Survey/" />
 		       <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
 		       <!--Import Google Icon Font-->
