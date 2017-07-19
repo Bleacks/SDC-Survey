@@ -1,0 +1,10 @@
+{
+    "autoload": {
+      "psr-4": { "Src\\": "src/" }
+    },
+    "require": {
+        "slim/slim": "^3.0",
+        "j4mie/idiorm": "^1.5",
+        "ircmaxell/password-compat": "^1.0"
+    }
+}
