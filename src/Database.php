@@ -56,7 +56,7 @@ class Database
 			'AnsweredSurvey'	=> array('idS', 'idU'),
 			'OtherSurvey'		=> array('idQ', 'idU'),
 			'Users'				=> 'idU',
-			'PendingSub'		=> 'Token',
+			'PendingSub'		=> 'idPS',
 			'Groups'			=> 'idG',
 			'Token'				=> 'idT'
 		));
