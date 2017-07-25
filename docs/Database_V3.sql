@@ -63,6 +63,7 @@ CREATE TABLE Survey(
         FinishedAt Datetime ,
         Document   Varchar (200) ,
         idGS       Int ,
+        idU        Int ,
         PRIMARY KEY (idS ) ,
         INDEX (Document )
 )ENGINE=InnoDB;
@@ -82,9 +83,8 @@ CREATE TABLE Users(
         Age       Int ,
         Status    Bool ,
         Admin     Bool ,
-        idS       Int ,
-        idT       Varchar (25) ,
         idG       Int ,
+        idPS      Int ,
         PRIMARY KEY (idU )
 )ENGINE=InnoDB;
 
@@ -107,6 +107,7 @@ CREATE TABLE Groups(
 CREATE TABLE Token(
         idT      Varchar (25) NOT NULL ,
         LastUsed Datetime ,
+        idU      Int ,
         PRIMARY KEY (idT )
 )ENGINE=InnoDB;
 
@@ -116,9 +117,8 @@ CREATE TABLE Token(
 #------------------------------------------------------------
 
 CREATE TABLE PendingSub(
-        idPS         VARCHAR(10) NOT NULL ,
+        idPS         Int NOT NULL ,
         SubscribedAt Datetime ,
-        idU          Int ,
         PRIMARY KEY (idPS )
 )ENGINE=InnoDB;
 
@@ -137,10 +137,10 @@ CREATE TABLE Answers(
 ALTER TABLE GenericQuestion ADD CONSTRAINT FK_GenericQuestion_idGS FOREIGN KEY (idGS) REFERENCES GenericSurvey(idGS);
 ALTER TABLE GenericAnswer ADD CONSTRAINT FK_GenericAnswer_idGQ FOREIGN KEY (idGQ) REFERENCES GenericQuestion(idGQ);
 ALTER TABLE Survey ADD CONSTRAINT FK_Survey_idGS FOREIGN KEY (idGS) REFERENCES GenericSurvey(idGS);
-ALTER TABLE Users ADD CONSTRAINT FK_Users_idS FOREIGN KEY (idS) REFERENCES Survey(idS);
-ALTER TABLE Users ADD CONSTRAINT FK_Users_idT FOREIGN KEY (idT) REFERENCES Token(idT);
+ALTER TABLE Survey ADD CONSTRAINT FK_Survey_idU FOREIGN KEY (idU) REFERENCES Users(idU);
 ALTER TABLE Users ADD CONSTRAINT FK_Users_idG FOREIGN KEY (idG) REFERENCES Groups(idG);
-ALTER TABLE PendingSub ADD CONSTRAINT FK_PendingSub_idU FOREIGN KEY (idU) REFERENCES Users(idU);
+ALTER TABLE Users ADD CONSTRAINT FK_Users_idPS FOREIGN KEY (idPS) REFERENCES PendingSub(idPS);
+ALTER TABLE Token ADD CONSTRAINT FK_Token_idU FOREIGN KEY (idU) REFERENCES Users(idU);
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGQ FOREIGN KEY (idGQ) REFERENCES GenericQuestion(idGQ);
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idS FOREIGN KEY (idS) REFERENCES Survey(idS);
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGA FOREIGN KEY (idGA) REFERENCES GenericAnswer(idGA);

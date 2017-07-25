@@ -30,6 +30,7 @@ functions = (function()
 				type       : 'POST',
 				complete   : function (response)
 				{
+					console.log(response);
 					//$('main').append(response.responseText);
 					var notification = $('#notification');
 					notification.slideUp("fast");
