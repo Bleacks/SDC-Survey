@@ -9,6 +9,18 @@ DROP TABLE IF EXISTS GenericQuestion;
 DROP TABLE IF EXISTS Survey;
 DROP TABLE IF EXISTS GenericSurvey;
 
+DROP TABLE IF EXISTS Token;
+
+DROP TABLE IF EXISTS Answers;
+DROP TABLE IF EXISTS GenericAnswer;
+DROP TABLE IF EXISTS GenericQuestion;
+DROP TABLE IF EXISTS Survey;
+DROP TABLE IF EXISTS GenericSurvey;
+
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Groups;
+DROP TABLE IF EXISTS PendingSub;
+
 #------------------------------------------------------------
 #        Script MySQL.
 #------------------------------------------------------------
@@ -144,3 +156,4 @@ ALTER TABLE Token ADD CONSTRAINT FK_Token_idU FOREIGN KEY (idU) REFERENCES Users
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGQ FOREIGN KEY (idGQ) REFERENCES GenericQuestion(idGQ);
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idS FOREIGN KEY (idS) REFERENCES Survey(idS);
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGA FOREIGN KEY (idGA) REFERENCES GenericAnswer(idGA);
+
