@@ -116,7 +116,7 @@ CREATE TABLE Token(
 #------------------------------------------------------------
 
 CREATE TABLE PendingSub(
-        idPS         Int NOT NULL ,
+        idPS         VARCHAR(10) NOT NULL ,
         SubscribedAt Datetime ,
         idU          Int ,
         PRIMARY KEY (idPS )

@@ -90,7 +90,7 @@ class Database
 
 		$sub = ORM::forTable('PendingSub')->create();
 
-		$sub->Token = $this->generateToken(10);
+		$sub->idPS = $this->generateToken(10);
 		$sub->idU = $user->id();
 		$sub->set_expr('SubscribedAt', 'NOW()');
 
