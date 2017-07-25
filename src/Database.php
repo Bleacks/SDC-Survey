@@ -86,12 +86,12 @@ class Database
 
 		$user->Email = $email;
 		$user->Pass = password_hash($password, PASSWORD_BCRYPT);
+		$user->idPS = $this->generateToken(10);
 		$res = $user->save();
 
 		$sub = ORM::forTable('PendingSub')->create();
 
-		$sub->idPS = $this->generateToken(10);
-		$sub->idU = $user->id();
+		$sub->idPS = $user->idPS;
 		$sub->set_expr('SubscribedAt', 'NOW()');
 
 		return $res && $sub->save();
