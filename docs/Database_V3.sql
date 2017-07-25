@@ -84,7 +84,7 @@ CREATE TABLE Users(
         Status    Bool ,
         Admin     Bool ,
         idG       Int ,
-        idPS      Int ,
+        idPS      Varchar (10) NOT NULL ,
         PRIMARY KEY (idU )
 )ENGINE=InnoDB;
 
@@ -117,7 +117,7 @@ CREATE TABLE Token(
 #------------------------------------------------------------
 
 CREATE TABLE PendingSub(
-        idPS         Int NOT NULL ,
+        idPS         Varchar (10) NOT NULL ,
         SubscribedAt Datetime ,
         PRIMARY KEY (idPS )
 )ENGINE=InnoDB;
