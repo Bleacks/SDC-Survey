@@ -3,13 +3,14 @@ functions = (function()
 {
 	var mail = '';
 	var pass = '';
+	var regex_mail = new RegExp('^([\\w\\-\\._]+\\@[\\w\\-_]+\\.[\\w\\-\\._]+)$');
 
-	return [
+	return {
 		/**
 		* Gather form's data and send it to the server using Ajax request
 		* Also handling errors that server could send back and push them to notification pane
 		*/
-		function connectUser()
+		connectUser: function connectUser()
 		{
 			var mail = $('#email').val().toLowerCase();
 			var pass = $('#password').val();
@@ -71,11 +72,11 @@ functions = (function()
 		/**
 		* Used to unvalid form when error is received and also to valid it back when changes are made
 		*/
-		function verifyFields()
+		verifyFields: function verifyFields()
 		{
 			var password = $('#password').val();
 			var email = $('#email').val().toLowerCase();
-			if (password != '' && email != '' && (password != pass || email != mail))
+			if (password != '' && email != '' && regex_mail.test(email) && (password != pass || email != mail))
 			{
 				$('#send').removeClass('disabled');
 				$('.required').removeClass('invalid').addClass('valid');
@@ -89,7 +90,7 @@ functions = (function()
 		/**
 		* Used to initialize form behavior and validation
 		*/
-		function onDocumentReady()
+		onDocumentReady: function onDocumentReady()
 		{
 			verifyFields(); // TODO: Vérifier que tous les formulaires ont un verify dès le début et sont disabled de base
 			$('.required').on('keyup', verifyFields);
@@ -98,18 +99,18 @@ functions = (function()
 		/**
 		* Used to allow user to submit form using Enter key
 		*/
-		function onKeyUp(event)
+		onKeyUp: function onKeyUp(event)
 		{
 			var keyCode = event.keyCode || event.which;
 			if (keyCode == 13 && !$('#send').hasClass('disabled'))
 				connectUser();
 		}
-	];
+	};
 
 })();
 
 
-connectUser = functions[0];
-verifyFields = functions[1];
-$(document).ready(functions[2]);
-$(window).on("keyup", functions[3]);
+connectUser = functions.connectUser;
+verifyFields = functions.verifyFields;
+$(document).ready(functions.onDocumentReady);
+$(window).on("keyup", functions.onKeyUp);

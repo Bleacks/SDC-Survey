@@ -63,7 +63,7 @@ $app->add(
 			$urlParts = explode('/', $url);
 			$needsAuth = !($urlParts[0] == 'Subscribe' && preg_match('/^[a-zA-Z0-9]{10}$/i', $urlParts[1]));
 		} else {
-			$needsAuth = !($url == 'Connect' || $url == 'Subscribe');
+			$needsAuth = !($url == 'Connect' || $url == 'Subscribe' || $url == 'Recover');
 		}
 
 		if ($needsAuth)
@@ -283,14 +283,7 @@ $app->post('/Subscribe/{token}', function (ServerRequestInterface $request, Resp
 
 
 
-$app->get('/Login', function (ServerRequestInterface $request, ResponseInterface $response)
-{
-	return Main::workInProgressPage();
-});
-
-
-
-$app->get('/Deco', function (ServerRequestInterface $request, ResponseInterface $response)
+$app->get('/Disconnect', function (ServerRequestInterface $request, ResponseInterface $response)
 {
 	if (isset($_SESSION['token']))
 	{
