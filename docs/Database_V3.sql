@@ -1,26 +1,6 @@
-DROP TABLE IF EXISTS PendingSub;
-DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS Groups;
-DROP TABLE IF EXISTS Token;
-
-DROP TABLE IF EXISTS Answers;
-DROP TABLE IF EXISTS GenericAnswer;
-DROP TABLE IF EXISTS GenericQuestion;
-DROP TABLE IF EXISTS Survey;
-DROP TABLE IF EXISTS GenericSurvey;
-
-DROP TABLE IF EXISTS Token;
-
-DROP TABLE IF EXISTS Answers;
-DROP TABLE IF EXISTS GenericAnswer;
-DROP TABLE IF EXISTS GenericQuestion;
-DROP TABLE IF EXISTS Survey;
-DROP TABLE IF EXISTS GenericSurvey;
-
-DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS Groups;
-DROP TABLE IF EXISTS PendingSub;
-
+DROP DATABASE sdc;
+CREATE DATABASE sdc;
+USE sdc;
 #------------------------------------------------------------
 #        Script MySQL.
 #------------------------------------------------------------
@@ -96,7 +76,6 @@ CREATE TABLE Users(
         Status    Bool ,
         Admin     Bool ,
         idG       Int ,
-        idPS      Varchar (10) NOT NULL ,
         PRIMARY KEY (idU )
 )ENGINE=InnoDB;
 
@@ -129,9 +108,22 @@ CREATE TABLE Token(
 #------------------------------------------------------------
 
 CREATE TABLE PendingSub(
+        idU          Int NOT NULL ,
         idPS         Varchar (10) NOT NULL ,
         SubscribedAt Datetime ,
-        PRIMARY KEY (idPS )
+        PRIMARY KEY (idU )
+)ENGINE=InnoDB;
+
+
+#------------------------------------------------------------
+# Table: Recovery
+#------------------------------------------------------------
+
+CREATE TABLE Recovery(
+        Email       Varchar (30) NOT NULL ,
+        Code        Varchar (10) ,
+        GeneratedAt Datetime ,
+        PRIMARY KEY (Email )
 )ENGINE=InnoDB;
 
 
@@ -151,9 +143,7 @@ ALTER TABLE GenericAnswer ADD CONSTRAINT FK_GenericAnswer_idGQ FOREIGN KEY (idGQ
 ALTER TABLE Survey ADD CONSTRAINT FK_Survey_idGS FOREIGN KEY (idGS) REFERENCES GenericSurvey(idGS);
 ALTER TABLE Survey ADD CONSTRAINT FK_Survey_idU FOREIGN KEY (idU) REFERENCES Users(idU);
 ALTER TABLE Users ADD CONSTRAINT FK_Users_idG FOREIGN KEY (idG) REFERENCES Groups(idG);
-ALTER TABLE Users ADD CONSTRAINT FK_Users_idPS FOREIGN KEY (idPS) REFERENCES PendingSub(idPS);
 ALTER TABLE Token ADD CONSTRAINT FK_Token_idU FOREIGN KEY (idU) REFERENCES Users(idU);
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGQ FOREIGN KEY (idGQ) REFERENCES GenericQuestion(idGQ);
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idS FOREIGN KEY (idS) REFERENCES Survey(idS);
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGA FOREIGN KEY (idGA) REFERENCES GenericAnswer(idGA);
-

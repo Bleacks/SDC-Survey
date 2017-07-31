@@ -83,17 +83,20 @@ class Database
 	{
 		// TODO: Crypter le mot de passe dès l'envoi
 		$user = ORM::forTable('Users')->create();
-		
-		$sub = ORM::forTable('PendingSub')->create();
-		$sub->idPS = $this->generateToken(10);
-		$sub->set_expr('SubscribedAt', 'NOW()');
-		$res = $sub->save();
-
 		$user->Email = $email;
 		$user->Pass = password_hash($password, PASSWORD_BCRYPT);
-		$user->idPS = $sub->idPS;
+		$res = $user->save();
 
-		return $res && $user->save();
+		if ($res)
+		{
+			$sub = ORM::forTable('PendingSub')->create();
+			$sub->idPS = $this->generateToken(10);
+			$sub->idU = $user->id();
+			$sub->set_expr('SubscribedAt', 'NOW()');
+			$res = $sub->save();
+		}
+
+		return $res;
 	}
 
 	/**
@@ -131,14 +134,9 @@ class Database
 		$user->Age = $age;
 
 		$code = $user->save();
-		
+
 		if ($code)
-		{
-			$user->idPS = null;
-			$code = $code && $user->save();
-			if ($code)
-				$code = $code && $pendingSub->delete();
-		}
+			$code = $pendingSub->delete();
 
 		return $code;
 	}

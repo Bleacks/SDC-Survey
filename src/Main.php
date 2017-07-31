@@ -34,7 +34,7 @@ class Main
 			1 => array('Demo', 'ondemand_video', 'Démonstration'),
 			2 => array('Surveys', 'assignment', 'Questionnaires'),
 			3 => array('Profile', 'account_box', 'Profil'),
-			4 => array('Reset', 'cached', 'Chaner le mot de passe'),
+			4 => array('Reset', 'cached', 'Changer le mot de passe'),
 			5 => array('Disconnect', 'launch', 'Déconnexion')
 		),
 		'Disconnected' => array(
