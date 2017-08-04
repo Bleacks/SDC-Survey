@@ -41,7 +41,7 @@ class Subscribe extends Main
 
 			<div class="row">
 				<div class="input-field col s12">
-					<input name="email" id="email" type="email" class="validate"  value="this.is@a.test" autofocus>
+					<input name="email" id="email" type="email" class="validate"  value="test@user.fr" autofocus>
 					<label class="required" for="email" data-error="Adresse email invalide (example@sdc.com)" data-success="Adresse email valide"><p class="required_flag">*</p> Email</label>
 				</div>
 		   </div>

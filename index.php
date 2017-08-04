@@ -36,6 +36,7 @@ use Src\Database;
 use Src\Connect;
 use Src\PasswordRecovery;
 use Src\Email;
+use Src\Survey;
 //use Src\MailManager;
 
 $app = new App([
@@ -60,13 +61,15 @@ $app->add(
 		$url = $request->getUri()->getPath();
 		$urlParts ='';
 		$needsAuth = true;
+        // FIXME: Put out the 'Kill' used to kill remaining sesion after database wipe
+        $publicPaths = array('Connect', 'Subscribe', 'Recover', 'Kill');
 
 		if (strpos($url, '/') !== false)
 		{
 			$urlParts = explode('/', $url);
 			$needsAuth = !($urlParts[0] == 'Subscribe' && preg_match('/^[a-zA-Z0-9]{10}$/i', $urlParts[1]));
 		} else {
-			$needsAuth = !($url == 'Connect' || $url == 'Subscribe' || 'Recuperation');
+			$needsAuth = !in_array($url, $publicPaths);
 		}
 
 		if ($needsAuth)
@@ -438,10 +441,30 @@ $app->get('/Messages', function (ServerRequestInterface $request, ResponseInterf
 
 
 
+$app->get('/Kill', function (ServerRequestInterface $request, ResponseInterface $response)
+{
+    session_destroy();
+    session_unset();
+});
+
+
+
 $app->get('/Test', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-	//return Main::workInProgressPage();
-	return $res = $response->withJson(var_dump($_SESSION), 424);
+    $switch = 'ui';
+    $val = 'ui';
+    switch ($switch)
+    {
+        case 1:
+            break;
+        case $val:
+            var_dump('Les switch avec "case $val:" fonctionnent');
+            break;
+        default:
+            break;
+    }
+    var_dump(password_hash('azer1', PASSWORD_BCRYPT));
+    var_dump($_SESSION);
 });
 
 
@@ -536,14 +559,35 @@ $app->post('/Subscribe/{token}', function (ServerRequestInterface $request, Resp
 
 
 
-$app->get('/Login', function (ServerRequestInterface $request, ResponseInterface $response)
+$app->get('/Surveys', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-	return Main::workInProgressPage();
+    $survey = new Survey();
+    // FIXME: Changer en id, et ajouter l'id dans la globale SESSION
+    return $survey->getSurveyMenu($_SESSION['email']);
+})->setName('Surveys');
+
+
+
+$app->get('/Surveys/{survey}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
+{
+    $survey = new Survey();
+    $survey->submitSurvey($args['survey']);
+    $uri = $request->getUri()->withPath($this->router->pathFor('Surveys'));
+    //return $response->withRedirect((string)$uri);
 });
 
 
 
-$app->get('/Deco', function (ServerRequestInterface $request, ResponseInterface $response)
+$app->post('/Surveys/{survey}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
+{
+    $survey = new Survey();
+    $survey->submitSurvey($args['survey']);
+    //return $survey->getSurvey($args['survey']);
+});
+
+
+
+$app->get('/Disconnect', function (ServerRequestInterface $request, ResponseInterface $response)
 {
 	if (isset($_SESSION['token']))
 	{

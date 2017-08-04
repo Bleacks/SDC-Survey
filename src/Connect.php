@@ -34,7 +34,7 @@ class Connect extends Main {
 			<div class="row">
 				<div class="input-field col s12">
 					<input name="email" id="email" type="email" class="required valid"  value="tst@user.fr" autofocus>
-					<label for="email"><p class="required_flag">*</p> Email</label>
+					<label for="email" data-success="Adresse email valide" data-error="Adresse email invalide (ex: adresse@mail.fr)"><p class="required_flag">*</p> Email</label>
 				</div>
 			</div>
 

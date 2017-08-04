@@ -9,6 +9,7 @@ namespace Src;
 *
 * Every Class that has to generate pages and return HTML code should extend this Class and use parent method used to create generic wrapper
 *
+* @method string generateSideNavElement($link, $icon, $name)
 * @method string header()
 * @method string main()
 * @method string footer()
@@ -22,7 +23,26 @@ class Main
 	const PRIMARY_COLOR = 'teal lighten-1';
 
 	/** Color displayed on secondary elements  (secondary color as Material Design describes it) */
-	const SECONDARY_COLOR = 'red';
+	const SECONDARY_COLOR = 'orange lighten-1';
+
+	/** Pages listed on website and accessible
+	Sorted by acces right
+	Contains URI, Icon name and Displayed name in Nav Bar */
+	const NAV_BAR_CONTENT = array(
+		'Connected' => array(
+			0 => array('/', 'home', 'Accueil'),
+			1 => array('Demo', 'ondemand_video', 'Démonstration'),
+			2 => array('Surveys', 'assignment', 'Questionnaires'),
+			3 => array('Profile', 'account_box', 'Profil'),
+			4 => array('Reset', 'cached', 'Changer le mot de passe'),
+			5 => array('Disconnect', 'launch', 'Déconnexion')
+		),
+		'Disconnected' => array(
+			0 => array('Connect', 'input', 'Connexion'),
+			1 => array('Subscribe', 'assignment_ind', 'Inscription'),
+			2 => array('Recovery', 'cached', 'Mot de passe oublié')
+		)
+	);
 
    /**
    * Constructor of the Main Class
@@ -33,6 +53,53 @@ class Main
       // TODO: Gestion hierachisée des erreurs pour factoriser au maximum les constantes
    }
 
+   	/**
+   	* Generates NavBar with the given color
+   	* @param string $color Color of icons
+   	* @return string HTML Code of the grey NavBar
+   	*/
+   private function generateNavBar($color)
+   {
+		$navBar = '';
+		$array = (isset($_SESSION['token']) && $_SESSION['token'] != '') ? Main::NAV_BAR_CONTENT['Connected'] : Main::NAV_BAR_CONTENT['Disconnected'];
+
+		for ($i = 0; $i < sizeof($array); $i++)
+		{
+			$link = $array[$i][0];
+			$icon = $array[$i][1];
+			$name = $array[$i][2];
+			$navBar .= '
+			<li>
+				<a class="flow-text" href='.$link.'>
+					<i class="'.$color.'-text text-darken-2 left material-icons">'.$icon.'</i>'
+				.$name.'</a>
+			</li>
+			';
+		}
+
+		return $navBar;
+	}
+
+	/**
+	* Generates white NavBar
+	* Calls generateNavBar
+	* @return string HTML Code of the white NavBar
+	*/
+   private function generateNavBarElement()
+   {
+	   return $this->generateNavBar('white');
+   }
+
+	/**
+	* Generates grey NavBar
+	* Calls generateNavBar
+	* @return string HTML Code of the grey NavBar
+	*/
+   private function generateSideBarElement()
+   {
+	   return $this->generateNavBar('grey');
+   }
+
    /**
    * Creates generic header
    * @return $header Computed header
@@ -40,22 +107,30 @@ class Main
 	private function header()
 	{
 		// TODO: Rediriger les href du header
+		/*$navContent = '';
+		if (isset($_SESSION['token']))
+      		$navContent .= $this->generateSideNavElement('/', 'home', 'Accueil')
+						.  $this->generateSideNavElement('Demo', 'ondemand_video', 'Démonstration')
+						.  $this->generateSideNavElement('Surveys', 'assignement', 'Questionnaires')
+						.  $this->generateSideNavElement('Profile', 'account_box', 'Profil')
+						.  $this->generateSideNavElement('Reset', 'cached', 'Changer le mot de passe')
+						.  $this->generateSideNavElement('Disconnect', 'launch', 'Déconnexion');
+		else
+			$navContent .= $this->generateSideNavElement('Connect', 'input', 'Connexion')
+						.  $this->generateSideNavElement('Subscribe', 'assignment_ind', 'Inscription')
+						.  $this->generateSideNavElement('Recovery', 'cached', 'Mot de passe oublié');*/
 		$header = '
 <header>
 	<nav class="'.Main::PRIMARY_COLOR.'">
     	<div class="nav-wrapper">
       		<a href="Accueil" class="brand-logo">SDC-Survey</a>
-			<ul id="nav-mobile" class="right hide-on-med-and-down">';
-		if (isset($_SESSION['token']))
-      		$header .= '
-				<li><a class="flow-text" href="Home">Accueil</a></li>
-				<li><a class="flow-text" href="Demo">Démo</a></li>
-				<li><a class="flow-text" href="Deco">Déconnexion</a></li>';
-		else
-			$header .= '
-				<li><a class="flow-text" href="Connect">Connexion</a></li>
-				<li><a class="flow-text" href="Subscribe">Inscription</a></li>';
-		$header .= '
+			<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+			<ul id="nav-mobile" class="right hide-on-med-and-down">
+				'. $this->generateNavBarElement() .'
+			</ul>
+			<ul class="side-nav" id="mobile-demo">
+				<h4 class="center-align teal-text">SDC-Survey</h4>
+				'. $this->generateSideBarElement() .'
 			</ul>
 		</div>
 	</nav>
