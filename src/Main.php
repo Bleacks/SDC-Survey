@@ -23,7 +23,7 @@ class Main
 	const PRIMARY_COLOR = 'teal lighten-1';
 
 	/** Color displayed on secondary elements  (secondary color as Material Design describes it) */
-	const SECONDARY_COLOR = 'red';
+	const SECONDARY_COLOR = 'orange lighten-1';
 
 	/** Pages listed on website and accessible
 	Sorted by acces right

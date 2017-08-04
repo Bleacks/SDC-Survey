@@ -58,7 +58,9 @@ class Database
 			'Users'				=> 'idU',
 			'PendingSub'		=> 'idPS',
 			'Groups'			=> 'idG',
-			'Token'				=> 'idT'
+			'Token'				=> 'idT',
+			'Iteration'			=> 'idIT',
+			'GenericSurvey'		=> 'idGS'
 		));
 	}
 
