@@ -203,13 +203,9 @@ class Main
    {
       error_log('Error creating Main.php : ' . $message);
    }
-
-	/**
-	* Creates a default page to notify end-user that content is currently unavailable dues to modifications
-	*/
-	public static function workInProgressPage()
+	
+	public function generateDefaultErrorPage($message)
 	{
-		$main = new Main();
-		return $main->generatePage('Work in progress');
+		return $this->generatePage($message, array());
 	}
 }
