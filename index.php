@@ -54,7 +54,8 @@ session_start();
 $app->add(function(ServerRequestInterface $request, ResponseInterface $response, Callable $next) {
         $url = $request->getUri()->getPath();
         $publicPaths = array('Connect', 'Subscribe', 'Recover', 'Kill');
-        $privatePaths = array('', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword');
+        // TODO: Retirer Test des URI autorisées
+        $privatePaths = array('', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword', 'Test');
         $path = 'Connect';
         $code = 404;
 
@@ -142,7 +143,7 @@ $app->get('/Recovery',function(ServerRequestInterface $request, ResponseInterfac
 	$recoveryPw = new PasswordRecovery();
 	$response = $recoveryPw->getPageFormRecoveryEmail();
 	return $response;
-	
+
 });
 
 $app->post('/Recovery', function (ServerRequestInterface $request, ResponseInterface $response)
@@ -151,7 +152,7 @@ $app->post('/Recovery', function (ServerRequestInterface $request, ResponseInter
 	$db = Database::getInstance();
 	$err = array('error' => "Email do not exist");
 	//$res = $response->withStatus(424);      // TODO : faire erreur!!!!!
-	
+
 	if ($post['recovery_email'] && !empty($post['recovery_email']))
 	{
 		$email = $post['recovery_email'];
@@ -160,13 +161,13 @@ $app->post('/Recovery', function (ServerRequestInterface $request, ResponseInter
 		{
 			$user = $db->getUser($email);
 			// TODO: TESTER
-			if($user != false) 
+			if($user != false)
 			{
 				$firstName = $user->firstName;
 				$lastName = $user->lastName;
 				// to avoid duplicate data
 				$recovery_code = $db->updateCode($email);
-		
+
 				if ($recovery_code != false)
 				{
 				$res = $response->withStatus(200);
@@ -174,8 +175,8 @@ $app->post('/Recovery', function (ServerRequestInterface $request, ResponseInter
 				}
 				//$email = new Email();
 				//$email->sendMail($firstName, $lastName);
-			
-			//$res = $response->withJson($err, 424);			
+
+			//$res = $response->withJson($err, 424);
 			}
 			else
 			{
@@ -183,10 +184,10 @@ $app->post('/Recovery', function (ServerRequestInterface $request, ResponseInter
 				//$error = "Vous n'êtes pas inscrit";
 			}
 		}
-		
+
 				//$res = $response->withJson(var_dump($user),424);
-				
-		/*else 
+
+		/*else
 		{
 			$error = "Entrer une adresse email valide" ;
 		}*/
@@ -199,21 +200,21 @@ $app->get('/Recovery/{code}', function(ServerRequestInterface $request, Response
 	$db = Database::getInstance();
 	$code = $args['code'];
 	$page = '';
-	
+
 	// Ajouter une validation du code (voir verification du token de /Subscribe)
 	if ($db->verifyRecoveryCode($code))
 	{
 		$recoveryNewPassword = new PasswordRecovery();
 		$page = $recoveryNewPassword->getPageFormRecoveryPw($code);
-	} 
+	}
 	else
 	{
 		//$res = $response->withJson($err, 403);
 		$main = new Main();
 		$page = $main->generateDefaultErrorPage("Votre code a expiré ou n'est pas valide, merci de bien vouloir soumettre votre demande de reinitialisation de mot de passe.");
-		
+
 		//return false; // Changer en page de "Déso ce code n'existe pas ou n'est plus valide"
-		
+
 		/*$check_req = $bdd->prepare('SELECT idRec FROM recovery WHERE email = ? AND code = ?');
 		$check_req->execute(array($_SESSION['recovery_email'],$check_code));
 		$check_req = $check_req->rowCount();
@@ -223,10 +224,10 @@ $app->get('/Recovery/{code}', function(ServerRequestInterface $request, Response
 		{
 			////////// MAX session recovery_email?????????
 			$up_req = $db->updateConfirmeEmail($recovery_email);
-			
+
 			$up_req = $bdd->prepare('UPDATE recovery SET confirme_email = 1 WHERE email = ?');
 			$up_req->execute(array($_SESSION['recovery_email']));
-	
+
 			// chnager l'url!
 			header('Location:http://127.0.0.1/path/recovery_pw.php?section=changepw');
 		} */
@@ -240,19 +241,19 @@ $app->post('/Recovery/{code}', function(ServerRequestInterface $request, Respons
 	$db = Database::getInstance();
 	$code = $args['code'];
 	$err = array('error' => "");
-	
-	if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '') 
+
+	if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '')
 	{
 		$change_pw = $post['change_pw'];
 		$change_pwc = $post['change_pwc'];
-		
+
 		// $res = $response->withJson(var_dump($post));
 		$pw = htmlspecialchars($change_pw);
 		$pwc = htmlspecialchars($change_pwc);
-		
+
 		$up_pass = $db->updatePassword($code,$pw);
 		$del_recovery = $db->deleteRecovery($code);
-		
+
 		if ($up_pass != false && $del_recovery != false)
 		{
 			$res = $response->withStatus(200);
@@ -261,69 +262,69 @@ $app->post('/Recovery/{code}', function(ServerRequestInterface $request, Respons
 		{
 			$res = $response->withJson($err, 424);
 		}
-	}	
+	}
 	else
 	{
 		$res = $response->withJson($err, 409);
 	}
-	
+
 	return $res;
 			//if(isset($post['change_pw'],$post['change_pwc'])) {
-				
+
 				////////// MAX session recovery_email?????????
 				//check_confirme_email = $db->checkConfirmEmail();
-				
+
 				/*$check_confirme_email = $bdd->prepare('SELECT confirme_email FROM recovery WHERE email = ?');
 				$check_confirme_email->execute(array($_SESSION['recovery_email']));
 				$check_confirme_email = $check_confirme_email->fetch();
 				$check_confirme_email = $check_confirme_email['confirme_email'];*/
-				
-				
+
+
 				//if($check_confirme_email == 1) {
-				
+
 				//if(!empty($pw) AND !empty($pwc)) {
 					/*if($pw == $pwc) // TODO: JS
 					{
 						$pw = password_encrypt($pw, PASSWORD_BCRYPT);
-						
+
 						//////////////// MAX pas obligé de mettre dans une variable n'est ce pas?????
 						$db->updatePw();
-						
+
 						/*$up_pw = $bdd->prepare('UPDATE users SET Pass = ? WHERE email = ?');
 						$up_pw->execute(array($pw,$_SESSION['recovery_email']));
-						
-						$db->delRecovery(); 
-						
+
+						$db->delRecovery();
+
 						/*$del_req = $bdd->prepare('DELETE FROM recovery WHERE email = ?');
 						$del_req->execute(array($_SESSION['recovery_email']));
-						
+
 						//CHAGER URLLLLL
 						//header('Location:http://127.0.0.1/path/connexion/');
-						
+
 					}
-					else 
+					else
 					{
 						$error = "Vos mots de passes ne correspondent pas";
 					}
 				}
-				else 
+				else
 				{
 					$error = "Veuillez remplir tous les champs";
 				}
 			}
 	}*/
 	// Ajouter une validation du code (voir verification du token de /Subscribe)
-	// Le commentaire précédent est à deux endrois dans le code, donc comme on aime pas dupliquer e code on va faire une .. une ... fonction ! :D 
+	// Le commentaire précédent est à deux endrois dans le code, donc comme on aime pas dupliquer e code on va faire une .. une ... fonction ! :D
 	// POUR FACTORISER JAMY JAMMIE JAMI JAMMY  OU ENCORE
-	
-	
+
+
 });
 
 
 /*$app->get('/Reinitialisation',function(ServerRequestInterface $request, ResponseInterface $response)
 {
 	$
-	
+
 });*/
 
 $app->get('/ChangePassword',function(ServerRequestInterface $request, ResponseInterface $response)
@@ -331,7 +332,7 @@ $app->get('/ChangePassword',function(ServerRequestInterface $request, ResponseIn
 	$recoveryPw = new PasswordRecovery();
 	$response = $recoveryPw->getFormChangePassword();
 	return $response;
-	
+
 });
 
 $app->post('/ChangePassword', function(ServerRequestInterface $request, ResponseInterface $response)
@@ -339,29 +340,29 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 	$post = $request->getParsedBody();
 	$db = Database::getInstance();
 	$err = array('error' => "");
-	
+
 	if (isset($post['old_pw']))
 	{
 		$old_pw = htmlspecialchars($old_pw);
-		
+
 		$email_user = $_SESSION['email'];
-		
+
 		$get_user = $db->getUser($email_user);
-		
+
 		if (password_verify($post['old_pw'], $get_user->Pass))
 		{
-			if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '') 
+			if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '')
 			{
 				$change_pw = $post['change_pw'];
 				$change_pwc = $post['change_pwc'];
-				
+
 				// $res = $response->withJson(var_dump($post));
 				$pw = htmlspecialchars($change_pw);
 				$pwc = htmlspecialchars($change_pwc);
-				
+
 				$up_pass = $db->updatePassword($code,$pw);
 				$del_recovery = $db->deleteRecovery($code);
-				
+
 				if ($up_pass != false && $del_recovery != false)
 				{
 					$res = $response->withStatus(200);
@@ -370,17 +371,17 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 				{
 					$res = $response->withJson($err, 424);
 				}
-			}	
+			}
 			else
 			{
 				$res = $response->withJson($err, 409);
 			}
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 	return $res;
 
 });
@@ -466,6 +467,19 @@ $app->get('/Test', function (ServerRequestInterface $request, ResponseInterface 
     }
     var_dump(password_hash('azer1', PASSWORD_BCRYPT));
     var_dump($_SESSION);
+    $user = Database::getInstance()->getUser($_SESSION['email']);
+    $values = array();
+    $mdp = 'azer2';
+    $values['Vérfication mot de passe'] = password_verify('azer1', '$2y$10$8VysYMpTUn/pDBHELLB5EuJZWCWdbfQYc5Qx9/maqGb.eF7N0BtPC');
+    $values['Mot de passe de départ'] = $user->Pass;
+    $values['Nouveau mot de passe'] = $mdp;
+    $user->Pass = password_hash($mdp, PASSWORD_BCRYPT);
+    $values['Nouveau hash'] = $user->Pass;
+    $user->save();
+    $user = Database::getInstance()->getUser($_SESSION['email']);
+    $values['Nouveau hash lu'] = $user->Pass;
+    $values['Nouvelle verification'] = password_verify('azer2', $user->Pass);
+    var_dump($values);
 });
 
 
