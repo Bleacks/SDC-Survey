@@ -28,13 +28,13 @@ class Main
 	/** Pages listed on website and accessible
 	Sorted by acces right
 	Contains URI, Icon name and Displayed name in Nav Bar */
-	const NAV_BAR_CONTENT = array(
+	const ACCESSIBLE_PAGES = array(
 		'Connected' => array(
-			0 => array('/', 'home', 'Accueil'),
+			0 => array('', 'home', 'Accueil'),
 			1 => array('Demo', 'ondemand_video', 'Démonstration'),
 			2 => array('Surveys', 'assignment', 'Questionnaires'),
 			3 => array('Profile', 'account_box', 'Profil'),
-			4 => array('Reset', 'cached', 'Changer le mot de passe'),
+			4 => array('ChangePassword', 'cached', 'Changer le mot de passe'),
 			5 => array('Disconnect', 'launch', 'Déconnexion')
 		),
 		'Disconnected' => array(
@@ -61,7 +61,7 @@ class Main
    private function generateNavBar($color)
    {
 		$navBar = '';
-		$array = (isset($_SESSION['token']) && $_SESSION['token'] != '') ? Main::NAV_BAR_CONTENT['Connected'] : Main::NAV_BAR_CONTENT['Disconnected'];
+		$array = (isset($_SESSION['token']) && $_SESSION['token'] != '') ? Main::ACCESSIBLE_PAGES['Connected'] : Main::ACCESSIBLE_PAGES['Disconnected'];
 
 		for ($i = 0; $i < sizeof($array); $i++)
 		{
@@ -238,9 +238,11 @@ class Main
 		       '. $this->header()
 		        . '
 			<main>
+				<div class="container row">
 				'
 				. $content
 				. '
+				</div>
 			</main>
 			'
 		        . $this->footer() .'

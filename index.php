@@ -47,48 +47,49 @@ $app = new App([
 // TODO: Ajouter explicitement le contenu généré à $response avant de la return
 
 session_start();
-//var_dump($_SESSION);
 
-// TODO: Change middleware, apply it to group instead of filtering url
-// FIXME: Ajouter un filtre pour éviter de demander l'accès pour une page qui n'existe pas ou n'en necessite pas
-
-
-$app->add(
-	function(ServerRequestInterface $request, ResponseInterface $response, Callable $next) {
-		$url = $request->getUri()->getPath();
-		$urlParts ='';
-		$needsAuth = true;
-        // FIXME: Put out the 'Kill' used to kill remaining sesion after database wipe
+$app->add(function(ServerRequestInterface $request, ResponseInterface $response, Callable $next) {
+        $url = $request->getUri()->getPath();
         $publicPaths = array('Connect', 'Subscribe', 'Recover', 'Kill');
+        $privatePaths = array('', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword');
+        $path = 'Connect';
+        $code = 404;
 
 		if (strpos($url, '/') !== false)
-		{
-			$urlParts = explode('/', $url);
-			$needsAuth = !($urlParts[0] == 'Subscribe' && preg_match('/^[a-zA-Z0-9]{10}$/i', $urlParts[1]));
-		} else {
-			$needsAuth = !in_array($url, $publicPaths);
-		}
+			$url = explode('/', $url)[0];
 
-		if ($needsAuth)
+		if (in_array($url, $privatePaths))
 		{
-			// Requested page needs authentication to be accessed
-			$db = Database::getInstance();
-			if (!isset($_SESSION['token']) || !$db->verifyConnectionToken($_SESSION['token']))
-			{
-				// User not connected
-				$_SESSION['url'] = $url;
-				return $response = $response->withRedirect('Connect', 403);
-			}
-		}
-		return $next($request, $response);
-	}
-);
+            if (isset($_SESSION['token']))
+            {
+                $db = Database::getInstance();
+                if ($db->verifyConnectionToken($_SESSION['token']))
+                {
+                    return $next($request, $response);
+                } else
+                {
+                    unset($_SESSION['token']);
+                }
+            }
+
+            $_SESSION['url'] = $url;
+            $code = 403;
+		} else
+        {
+            // TODO: Voir pour changer par une page not found générique intégrée au site
+            if (in_array($url, $publicPaths))
+                return $next($request, $response);
+            else
+                $path = $request->getUri()->getBasePath();
+        }
+        return $response->withRedirect($path, $code);
+});
 
 // NOTE: Main ne doit être utilisée que par les classes spécifiques, vers lesquelles Slim redirige
 
 
 
-$app->get('/Home', function (ServerRequestInterface $request, ResponseInterface $response)
+$app->get('/', function (ServerRequestInterface $request, ResponseInterface $response)
 {
 	/*
 	$res = $response->withJson(var_dump('mot de passe'));
