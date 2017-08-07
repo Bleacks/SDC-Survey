@@ -59,6 +59,7 @@ class Database
 			'PendingSub'		=> 'idPS',
 			'Groups'			=> 'idG',
 			'Token'				=> 'idT',
+			'Recovery'			=> 'code',
 			'Iteration'			=> 'idIT',
 			'GenericSurvey'		=> 'idGS'
 		));
@@ -112,7 +113,7 @@ class Database
 		$string = '';
 		for ($i = 0; $i < $tokenLength; $i++)
 		{
-			$string .= $alphabet[rand(0,61)];
+			$string .= $alphabet[mt_rand(0,61)];
 	  	}
 		return $string;
 	}
@@ -150,9 +151,76 @@ class Database
 	*/
 	public function getUser($email)
 	{
+		$user = false;
 		if (!is_null($email))
 			$user = ORM::forTable('Users')->where('email', $email)->findOne();
 		return $user;
+	}
+	
+	/**
+	* Updates the code of the recovery associated to the given email adress
+	* @param string $email Email adress of the user
+	* @return bool True if the update is successfull
+	*/
+	function updateCode($recovery_email)
+	{
+		$recovery_demand = ORM::forTable('Recovery')->findOne($recovery_email);
+		if ($recovery_demand == false)
+		{
+			$recovery_demand = ORM::forTable('Recovery')->create();
+			$recovery_demand->Email = $recovery_email;			
+		}
+		$recovery_demand->set_expr('GeneratedAt', 'NOW()');
+		$recovery_demand->Code = $this->generateToken(10);
+		
+		return $recovery_demand->save() ? $recovery_demand->Code : false;
+	}
+	
+	/**
+	* 
+	*/
+	public function verifyRecoveryCode($code){
+		$res = false;
+		$recovery = ORM::forTable('Recovery')->findOne($code);
+		if ($recovery != false)
+		{
+			$res = $this->dateDiffNow($recovery->generatedAt)->days == 0;
+			if (!$res) 
+			{
+				$recovery->delete();
+			}
+		}
+		return $res;
+	}	
+	
+	/**
+	* Update the database with the new password
+	*/
+	public function updatePassword($code, $password)
+	{
+		$recovery = ORM::forTable('Recovery')->findOne($code);
+		$user = ORM::forTable('Users')->findOne($recovery->idU);
+		$password = password_hash($password, PASSWORD_BCRYPT);
+		$user->Pass = $password;
+		return $user->save();
+	}
+	
+	/**
+	* Delete from recovery the user who change his password
+	*/
+	public function deleteRecovery($code)
+	{
+		$del_rec = ORM::forTable('Recovery')->where ('code',$code)->findOne();
+		return $del_rec->delete();
+		
+		/*$del_req = $bdd->prepare('DELETE FROM recovery WHERE email = ?');
+		$del_req->execute(array($_SESSION['recovery_email']));*/
+	}
+	
+	// A REVOIRRRRRRR
+	public function getGeneratedDateRecovery($email)
+	{
+		return ORM::forTable('Recovery')->findOne($email);
 	}
 
 	/**
@@ -172,11 +240,6 @@ class Database
 	*/
 	public function verifySubscriptionToken($subscriptionToken)
 	{
-		// FIXME: Rename en verifySubscriptionToken
-		/*
-		$date = new DateTime($subscriptionToken->SubscribedAt, new DateTimeZone("Europe/Paris"));
-		$now = new DateTime("now", new DateTimeZone("Europe/Paris"));
-		return $isValid = $now->diff($date)->days == 0;*/
 		return $this->dateDiffNow($subscriptionToken->SubscibedAt)->days == 0;
 	}
 
