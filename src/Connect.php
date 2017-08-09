@@ -22,11 +22,8 @@ class Connect extends Main {
 	*/
 	public function getPageConnect()
 	{
-		$content =
-'<div class="container">
-	<div class="row">
+		$content = '
 		<div class="col s12">
-
 			<div class="row">
 				<h4>Veuillez renseigner les champs ci-dessous pour vous connecter</h4>
 			</div>
@@ -43,19 +40,15 @@ class Connect extends Main {
 					<input id="password" type="password" class="required valid" value="azer1">
 					<label for="password"><p class="required_flag">*</p> Password</label>
 				</div>
-				<div class="input-field col s12">
-					<input id="remember" type="checkbox" checked class="filled-in">
+				<p class="col s12">
+					<input id="remember" type="checkbox" checked="checked" class="filled-in">
 					<label for="remember">Se souvenir de moi</label>
-				</div>
+				</p>
 			</div>
-
 		  '.
 		  parent::getButton('connectUser()')
 		  .'
-
-		</div>
-	</div>
-</div>';
+	  </div>';
 		return parent::generatePage($content, array('Connection'));
 	}
 }

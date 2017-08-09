@@ -156,7 +156,16 @@ class Database
 			$user = ORM::forTable('Users')->where('email', $email)->findOne();
 		return $user;
 	}
-	
+
+	/**
+	* Retrieves all the groups
+	* @return Object(ORM) All groups
+	*/
+	public function getGroups()
+	{
+		return ORM::forTable('Groups')->findMany();
+	}
+
 	/**
 	* Updates the code of the recovery associated to the given email adress
 	* @param string $email Email adress of the user
@@ -168,16 +177,18 @@ class Database
 		if ($recovery_demand == false)
 		{
 			$recovery_demand = ORM::forTable('Recovery')->create();
-			$recovery_demand->Email = $recovery_email;			
+			$recovery_demand->Email = $recovery_email;
 		}
 		$recovery_demand->set_expr('GeneratedAt', 'NOW()');
 		$recovery_demand->Code = $this->generateToken(10);
-		
+
 		return $recovery_demand->save() ? $recovery_demand->Code : false;
 	}
-	
+
 	/**
-	* 
+	* Delete in Recovery table the row associate to the given code
+	* @param varchar $code generate code for the recovery password
+	* @return bool True if the delete is successfull
 	*/
 	public function verifyRecoveryCode($code){
 		$res = false;
@@ -185,16 +196,19 @@ class Database
 		if ($recovery != false)
 		{
 			$res = $this->dateDiffNow($recovery->generatedAt)->days == 0;
-			if (!$res) 
+			if (!$res)
 			{
 				$recovery->delete();
 			}
 		}
 		return $res;
-	}	
-	
+	}
+
 	/**
 	* Update the database with the new password
+	* @param varchar $code generate code for the recovery password
+	* @param varchar $password Password of the user
+	* @return bool True if the password was successfully update
 	*/
 	public function updatePassword($code, $password)
 	{
@@ -204,19 +218,18 @@ class Database
 		$user->Pass = $password;
 		return $user->save();
 	}
-	
+
 	/**
-	* Delete from recovery the user who change his password
+	* Delete from Recovery table the row associate to the given code
+	* @param varchar $code generate code for the recovery password
+	* @return True if the delete is successfull
 	*/
 	public function deleteRecovery($code)
 	{
 		$del_rec = ORM::forTable('Recovery')->where ('code',$code)->findOne();
 		return $del_rec->delete();
-		
-		/*$del_req = $bdd->prepare('DELETE FROM recovery WHERE email = ?');
-		$del_req->execute(array($_SESSION['recovery_email']));*/
 	}
-	
+
 	// A REVOIRRRRRRR
 	public function getGeneratedDateRecovery($email)
 	{

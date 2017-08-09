@@ -30,11 +30,8 @@ class Subscribe extends Main
 
 		// TODO: Ajouter un error Handler pour le cas où l'utilisateur n'a pas à s'incrire sur la plateforme
 		// FIXME: Changer le bouton mail pour qu'il redirige vers n'importe quel outil de mail
-      $content =
-'<div class="container">
-	<div class="row">
+      $content ='
 		<div class="col s12">
-
 			<div class="row">
 				<h4>Pour vous inscrire veuillez remplir les champs ci-dessous</h4>
 			</div>
@@ -66,9 +63,7 @@ class Subscribe extends Main
 		</div>
 
 		<!-- Modal that is shown to User after submitting the form -->
-		' . $this->getSubscribeModal() . '
-	</div>
-</div>';
+		' . $this->getSubscribeModal();
       //return parent::generatePage($content, array('FormConfirm', 'Subscribe'));
 	  return parent::generatePage($content, array('FormConfirm', 'Subscription'));
    }
@@ -181,9 +176,6 @@ class Subscribe extends Main
 	   // TODO: Rename JS File (FormConfirm => SubscribeFormValidator)
 	   // TODO: Replace default test values with blank and disable button
 	   $content = '
-<div class="container">
-	<div class="row">
-
 		<div class="row">
 			<h4>Veuillez renseigner ces informations pour terminer votre inscription</h4>
 		</div>
@@ -240,15 +232,11 @@ class Subscribe extends Main
 	        </div>
 		</div>
 
-
 		'.
 		parent::getButton('confirmSubscription(\''.$token.'\')')
 		.'
+		'. $this->getSubscribeConfirmationModal();
 
-		'. $this->getSubscribeConfirmationModal() .'
-
-	</div>
-</div>';
 	  return parent::generatePage($content, array('Subscription', 'SubscribeConfirmationValidator'));
    }
 }

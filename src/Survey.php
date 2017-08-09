@@ -10,14 +10,13 @@ class Survey extends Main
 
     }
 
-    // TODO: Supprimer l'autre fonction, revoir les noms de variables et regrouper dans les classes adaptées
+    // TODO: Revoir les noms de variables et regrouper dans les classes adaptées
     public function getSurveyMenu($email)
     {
         $db = Database::getInstance();
         $surveyType = \ORM::forTable('GenericSurvey')->findMany();
         $user = $db->getUser($email);
-        $content = '
-            <div class="container row">';
+        $content = '';
         foreach ($surveyType as $survey)
         {
             $iteration = \ORM::forTable('Iteration')->where('idGS', $survey->idGS)->findOne();
@@ -25,25 +24,23 @@ class Survey extends Main
             $submissionsCount = sizeof($submittedAnswers);
             switch ($survey->SubmissionLimit)
             {
-                case 1:
+                case 1:     // Unique submission
                     $content .= ($survey->SubmissionLimit == $submissionsCount) ? $this->generateDisabledCard($survey) : $this->generateActiveCard($survey);
                     break;
-                case $submissionsCount:
-                    if ($submissionsCount == 0)
-                        $content .= $this->generateActiveCard($survey);
+
+                case 0:     // Unlimited submissions
+                    $content .= $this->generateActiveCard($survey, $submissionsCount);
+                    break;
+
+                default:    // Multiple submissions
+                    if ($submissionsCount < $survey->SubmissionLimit)
+                        $content .= $this->generateActiveCard($survey, $submissionsCount);
                     else
-                        $content .= $this->generateDisabledCard($survey);
-                    break;
-                case 0:
-                    $content .= $this->generateActiveCard($survey, $submissionsCount);
-                    break;
-                default:
-                    $content .= $this->generateActiveCard($survey, $submissionsCount);
+                        $content .= $this->generateDisabledCard($survey, $submissionsCount);
                     break;
             }
         }
-        $content .= '
-            </div>';
+        $content .= '';
 
         return parent::generatePage($content, array('Surveys'));
     }
@@ -56,7 +53,7 @@ class Survey extends Main
 <div class="col s6">
     <div class="card hoverable sticky-action">
         <div class="card-image">
-        '. $floating .'
+            '. $floating .'
             <img src="img/surveys/'. 1 .'.jpg">
         </div>
 
@@ -81,12 +78,16 @@ class Survey extends Main
         return $card;
     }
 
-    private function generateDisabledCard($survey)
+    private function generateDisabledCard($survey, $count = 0)
     {
+        $floating = ($count > 0) ? '<a class="btn-floating halfway-fab disabled waves-effect waves-light '. parent::SECONDARY_COLOR .'" onclick=""><p class="center" style="margin-top: 0%;">'. $count .'</p></a>' : '';
+        $icon = ($count > 0) ? 'done_all' : 'done';
+        $link = ($count > 0) ? 'Réponses envoyées' : 'Réponse envoyée';
         $card = '
 <div class="col s6">
     <div class="card hoverable sticky-action">
         <div class="card-image">
+            '. $floating .'
             <img src="img/surveys/'. 1 .'.jpg" style="opacity: 0.4">
         </div>
 
@@ -96,7 +97,7 @@ class Survey extends Main
         </div>
 
         <div class="card-action">
-            <a class="grey-text" id="'. $survey->idGS .'" onclick=""><i class="material-icons right">done</i>Réponse envoyée</a>
+            <a class="grey-text" id="'. $survey->idGS .'" onclick=""><i class="material-icons right">'. $icon .'</i>'. $link .'</a>
         </div>
 
         <div class="card-reveal">

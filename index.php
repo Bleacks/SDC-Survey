@@ -37,6 +37,7 @@ use Src\Connect;
 use Src\PasswordRecovery;
 use Src\Email;
 use Src\Survey;
+use Src\Profile;
 //use Src\MailManager;
 
 $app = new App([
@@ -50,55 +51,57 @@ $app = new App([
 // TODO: Ajouter explicitement le contenu généré à $response avant de la return
 
 session_start();
-//var_dump($_SESSION);
 
-// TODO: Change middleware, apply it to group instead of filtering url
-// FIXME: Ajouter un filtre pour éviter de demander l'accès pour une page qui n'existe pas ou n'en necessite pas
-
-
-$app->add(
-	function(ServerRequestInterface $request, ResponseInterface $response, Callable $next) {
-		$url = $request->getUri()->getPath();
-		$urlParts ='';
-		$needsAuth = true;
-        // FIXME: Put out the 'Kill' used to kill remaining sesion after database wipe
-        $publicPaths = array('Connect', 'Subscribe', 'Recover', 'Kill');
+$app->add(function(ServerRequestInterface $request, ResponseInterface $response, Callable $next) {
+        $url = $request->getUri()->getPath();
+        $publicPaths = array('Connect', 'Subscribe', 'Recovery', 'Kill');
+        // TODO: Retirer Test des URI autorisées
+        $privatePaths = array('', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword', 'Test');
+        $path = 'Connect';
+        $code = 404;
 
 		if (strpos($url, '/') !== false)
-		{
-			$urlParts = explode('/', $url);
-			$needsAuth = !($urlParts[0] == 'Subscribe' && preg_match('/^[a-zA-Z0-9]{10}$/i', $urlParts[1]));
-		} else {
-			$needsAuth = !in_array($url, $publicPaths);
-		}
+			$url = explode('/', $url)[0];
 
-		if ($needsAuth)
+		if (in_array($url, $privatePaths))
 		{
-			// Requested page needs authentication to be accessed
-			$db = Database::getInstance();
-			if (!isset($_SESSION['token']) || !$db->verifyConnectionToken($_SESSION['token']))
-			{
-				// User not connected
-				$_SESSION['url'] = $url;
-				return $response = $response->withRedirect('Connect', 403);
-			}
-		}
-		return $next($request, $response);
-	}
-);
+            if (isset($_SESSION['token']))
+            {
+                $db = Database::getInstance();
+                if ($db->verifyConnectionToken($_SESSION['token']))
+                {
+                    return $next($request, $response);
+                } else
+                {
+                    unset($_SESSION['token']);
+                }
+            }
+
+            $_SESSION['url'] = $url;
+            $code = 403;
+		} else
+        {
+            // TODO: Voir pour changer par une page not found générique intégrée au site
+            if (in_array($url, $publicPaths))
+                return $next($request, $response);
+            else
+                $path = $request->getUri()->getBasePath();
+        }
+        return $response->withRedirect($path, $code);
+});
 
 // NOTE: Main ne doit être utilisée que par les classes spécifiques, vers lesquelles Slim redirige
 
 
 
-$app->get('/Home', function (ServerRequestInterface $request, ResponseInterface $response)
+$app->get('/', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-	
+
 	/*$res = $response->withJson(var_dump('mot de passe'));
 	$hash = password_hash('mot de passe', PASSWORD_BCRYPT);
 	$res = $res->withJson(var_dump($hash));
 	$res = $res->withJson(var_dump(password_verify('mot de passe', $hash)));*/
-	
+
 	// FIXME: Write test for the dateDiffNow function
 	//return Main::workInProgressPage();
 });
@@ -112,11 +115,23 @@ $app->get('/Demo', function (ServerRequestInterface $request, ResponseInterface 
 
 
 
-$app->get('/Profile/{num}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
+$app->get('/Profile', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-    #return 'Profil numéro '.$args['num'];
-    return Main::workInProgressPage();
+    $db = Database::getInstance();
+    $profile = new Profile();
+
+    $user = $db->getUser($_SESSION['email']);
+    $groups = $db->getGroups();
+
+    $response = $profile->getPageProfile($user, $groups);
+    return $response;
 });
+
+$app->put('/Profile', function (ServerRequestInterface $request, ResponseInterface $response)
+{
+
+});
+
 
 
 
@@ -187,7 +202,7 @@ $app->get('/Recovery',function(ServerRequestInterface $request, ResponseInterfac
 	$recoveryPw = new PasswordRecovery();
 	$response = $recoveryPw->getPageFormRecoveryEmail();
 	return $response;
-	
+
 });
 
 
@@ -197,7 +212,7 @@ $app->post('/Recovery', function (ServerRequestInterface $request, ResponseInter
 	$db = Database::getInstance();
 	$err = array('error' => "Email do not exist");
 	//$res = $response->withStatus(424);      // TODO : faire erreur!!!!!
-	
+
 	if ($post['recovery_email'] && !empty($post['recovery_email']))
 	{
 		$email = $post['recovery_email'];
@@ -206,13 +221,13 @@ $app->post('/Recovery', function (ServerRequestInterface $request, ResponseInter
 		{
 			$user = $db->getUser($email);
 			// TODO: TESTER
-			if($user != false) 
+			if($user != false)
 			{
 				$firstName = $user->firstName;
 				$lastName = $user->lastName;
 				// to avoid duplicate data
 				$recovery_code = $db->updateCode($email);
-		
+
 				if ($recovery_code != false)
 				{
 				$res = $response->withStatus(200);
@@ -220,15 +235,15 @@ $app->post('/Recovery', function (ServerRequestInterface $request, ResponseInter
 				}
 				//$email = new Email();
 				//$email->sendMail($firstName, $lastName);
-			
-			//$res = $response->withJson($err, 424);			
+
+			//$res = $response->withJson($err, 424);
 			}
 			else
 			{
 				$res = $response->withJson($err, 424);
 			}
 		}
-		
+
 				//$res = $response->withJson(var_dump($user),424);
 	}
 	return $res;
@@ -240,13 +255,13 @@ $app->get('/Recovery/{code}', function(ServerRequestInterface $request, Response
 	$db = Database::getInstance();
 	$code = $args['code'];
 	$page = '';
-	
+
 	// Ajouter une validation du code (voir verification du token de /Subscribe)
 	if ($db->verifyRecoveryCode($code))
 	{
 		$recoveryNewPassword = new PasswordRecovery();
 		$page = $recoveryNewPassword->getPageFormRecoveryPw($code);
-	} 
+	}
 	else
 	{
 		//$res = $response->withJson($err, 403);
@@ -263,19 +278,19 @@ $app->post('/Recovery/{code}', function(ServerRequestInterface $request, Respons
 	$db = Database::getInstance();
 	$code = $args['code'];
 	$err = array('error' => "");
-	
-	if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '') 
+
+	if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '')
 	{
 		$change_pw = $post['change_pw'];
 		$change_pwc = $post['change_pwc'];
-		
+
 		// $res = $response->withJson(var_dump($post));
 		$pw = htmlspecialchars($change_pw);
 		$pwc = htmlspecialchars($change_pwc);
-		
+
 		$up_pass = $db->updatePassword($code,$pw);
 		$del_recovery = $db->deleteRecovery($code);
-		
+
 		if ($up_pass != false && $del_recovery != false)
 		{
 			$res = $response->withStatus(200);
@@ -284,7 +299,7 @@ $app->post('/Recovery/{code}', function(ServerRequestInterface $request, Respons
 		{
 			$res = $response->withJson($err, 424);
 		}
-	}	
+	}
 	else
 	{
 		$res = $response->withJson($err, 409);
@@ -292,13 +307,12 @@ $app->post('/Recovery/{code}', function(ServerRequestInterface $request, Respons
 	return $res;
 });
 
-
 $app->get('/ChangePassword',function(ServerRequestInterface $request, ResponseInterface $response)
 {
 	$recoveryPw = new PasswordRecovery();
 	$response = $recoveryPw->getFormChangePassword();
 	return $response;
-	
+
 });
 
 $app->post('/ChangePassword', function(ServerRequestInterface $request, ResponseInterface $response)
@@ -307,43 +321,43 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 	$db = Database::getInstance();
 	$err = array('error' => "");
 	$res = $response->withStatus(424);
-	
+
 	if (isset($post['old_pw']))
 	{
 		//$old_pw = htmlspecialchars($post['old_pw']);
-		
-		
+
+
 		$old_pw = substr($post['old_pw'], 0, 60);
-		
+
 		$email_user = $_SESSION['email'];
-		
+
 		$user = $db->getUser($email_user);
 		//$bite = $user->Pass;
-		
+
 		/*$choses = array(
 			password_verify($old_pw, substr(settype($bite, 'string'), 0, 60)),
 			password_verify('azer1', password_hash($old_pw, PASSWORD_BCRYPT))
 		);*/
 		//$res = $response->withJson(var_dump(password_verify($old_pw, '$2y$10$g2Wk.XsyOvxXKzKrmzVYwefOFbuiX3GNP3pHq0D23SjrWlaNqUgNa')));
-		
-		
+
+
 		if (password_verify($old_pw, $user->Pass))
 		{
-			if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '') 
+			if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '')
 			{
 				$change_pw = $post['change_pw'];
 				$change_pwc = $post['change_pwc'];
-				
-				$blabla = "je suis la";
-				$res = $response->withJson(var_dump($blabla));
-				
+
+				/*$blabla = "je suis la";
+				$res = $response->withJson(var_dump($blabla));*/
+
 				// $res = $response->withJson(var_dump($post));
 				$pw = htmlspecialchars($change_pw);
 				$pwc = htmlspecialchars($change_pwc);
-				
+
 				$up_pass = $db->updatePassword($code,$pw);
 				$del_recovery = $db->deleteRecovery($code);
-				
+
 				if ($up_pass != false && $del_recovery != false)
 				{
 					$res = $response->withStatus(200);
@@ -352,7 +366,7 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 				{
 					$res = $response->withJson($err, 424);
 				}
-			}	
+			}
 			else
 			{
 				$res = $response->withJson($err, 409);
@@ -396,6 +410,19 @@ $app->get('/Test', function (ServerRequestInterface $request, ResponseInterface 
     }
     var_dump(password_hash('azer1', PASSWORD_BCRYPT));
     var_dump($_SESSION);
+    $user = Database::getInstance()->getUser($_SESSION['email']);
+    $values = array();
+    $mdp = 'azer2';
+    $values['Vérfication mot de passe'] = password_verify('azer1', '$2y$10$8VysYMpTUn/pDBHELLB5EuJZWCWdbfQYc5Qx9/maqGb.eF7N0BtPC');
+    $values['Mot de passe de départ'] = $user->Pass;
+    $values['Nouveau mot de passe'] = $mdp;
+    $user->Pass = password_hash($mdp, PASSWORD_BCRYPT);
+    $values['Nouveau hash'] = $user->Pass;
+    $user->save();
+    $user = Database::getInstance()->getUser($_SESSION['email']);
+    $values['Nouveau hash lu'] = $user->Pass;
+    $values['Nouvelle verification'] = password_verify('azer2', $user->Pass);
+    var_dump($values);
 });
 
 
