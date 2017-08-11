@@ -30,7 +30,7 @@ class Main
 	Contains URI, Icon name and Displayed name in Nav Bar */
 	const ACCESSIBLE_PAGES = array(
 		'Connected' => array(
-			0 => array('', 'home', 'Accueil'),
+			0 => array('Home', 'home', 'Accueil'),
 			1 => array('Demo', 'ondemand_video', 'Démonstration'),
 			2 => array('Surveys', 'assignment', 'Questionnaires'),
 			3 => array('Profile', 'account_box', 'Profil'),
@@ -106,19 +106,6 @@ class Main
    */
 	private function header()
 	{
-		// TODO: Rediriger les href du header
-		/*$navContent = '';
-		if (isset($_SESSION['token']))
-      		$navContent .= $this->generateSideNavElement('/', 'home', 'Accueil')
-						.  $this->generateSideNavElement('Demo', 'ondemand_video', 'Démonstration')
-						.  $this->generateSideNavElement('Surveys', 'assignement', 'Questionnaires')
-						.  $this->generateSideNavElement('Profile', 'account_box', 'Profil')
-						.  $this->generateSideNavElement('Reset', 'cached', 'Changer le mot de passe')
-						.  $this->generateSideNavElement('Disconnect', 'launch', 'Déconnexion');
-		else
-			$navContent .= $this->generateSideNavElement('Connect', 'input', 'Connexion')
-						.  $this->generateSideNavElement('Subscribe', 'assignment_ind', 'Inscription')
-						.  $this->generateSideNavElement('Recovery', 'cached', 'Mot de passe oublié');*/
 		$header = '
 <header>
 	<nav class="'.Main::PRIMARY_COLOR.'">
@@ -206,7 +193,7 @@ class Main
    /**
    * Wraps content created by specific sub-class with general header and footer
    */
-   protected function generatePage($content, $scripts = array())
+   public function generatePage($content, $scripts = array())
    {
 	   $script = '';
 	   $scripts[] = 'Loading';
@@ -218,6 +205,7 @@ class Main
 		 <html>
 		    <head>
 		       <!--Initialize environment-->
+			   <title>SDC-Survey</title>
 		       <base href="/SDC-Survey/" />
 		       <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
@@ -280,7 +268,7 @@ class Main
    {
       error_log('Error creating Main.php : ' . $message);
    }
-	
+
 	public function generateDefaultErrorPage($message)
 	{
 		return $this->generatePage($message, array());

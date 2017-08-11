@@ -156,7 +156,17 @@ class Database
 			$user = ORM::forTable('Users')->where('email', $email)->findOne();
 		return $user;
 	}
-	
+
+	/**
+	* Indicates if the User associated to this email is an admin or not
+	* @param string $email Email of the User
+	* @return bool True only if User is an admin
+	*/
+	public function isAdmin($email)
+	{
+		return $this->getUser($email)->Admin == 1;
+	}
+
 	/**
 	* Updates the code of the recovery associated to the given email adress
 	* @param string $email Email adress of the user
@@ -168,16 +178,16 @@ class Database
 		if ($recovery_demand == false)
 		{
 			$recovery_demand = ORM::forTable('Recovery')->create();
-			$recovery_demand->Email = $recovery_email;			
+			$recovery_demand->Email = $recovery_email;
 		}
 		$recovery_demand->set_expr('GeneratedAt', 'NOW()');
 		$recovery_demand->Code = $this->generateToken(10);
-		
+
 		return $recovery_demand->save() ? $recovery_demand->Code : false;
 	}
-	
+
 	/**
-	* 
+	*
 	*/
 	public function verifyRecoveryCode($code){
 		$res = false;
@@ -185,14 +195,14 @@ class Database
 		if ($recovery != false)
 		{
 			$res = $this->dateDiffNow($recovery->generatedAt)->days == 0;
-			if (!$res) 
+			if (!$res)
 			{
 				$recovery->delete();
 			}
 		}
 		return $res;
-	}	
-	
+	}
+
 	/**
 	* Update the database with the new password
 	*/
@@ -204,7 +214,7 @@ class Database
 		$user->Pass = $password;
 		return $user->save();
 	}
-	
+
 	/**
 	* Delete from recovery the user who change his password
 	*/
@@ -212,11 +222,11 @@ class Database
 	{
 		$del_rec = ORM::forTable('Recovery')->where ('code',$code)->findOne();
 		return $del_rec->delete();
-		
+
 		/*$del_req = $bdd->prepare('DELETE FROM recovery WHERE email = ?');
 		$del_req->execute(array($_SESSION['recovery_email']));*/
 	}
-	
+
 	// A REVOIRRRRRRR
 	public function getGeneratedDateRecovery($email)
 	{
@@ -314,5 +324,15 @@ class Database
 	public function deleteConnectionToken($token)
 	{
 		return ORM::forTable('Token')->findOne($token)->delete();
+	}
+
+	/**
+	* Retrieves all possible answers for a given question
+	* @param int $questionId Id of the genericQuestion
+	* @return Object(ORM) List of possible answers to this question
+	*/
+	public function getAllAnswers($questionId)
+	{
+		return ORM::forTable('GenericAnswer')->where('idGQ', $questionId)->findMany();
 	}
 }

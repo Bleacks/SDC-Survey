@@ -41,7 +41,7 @@ class Connect extends Main {
 					<label for="password"><p class="required_flag">*</p> Password</label>
 				</div>
 				<p class="col s12">
-					<input id="remember" type="checkbox" checked="checked" class="filled-in">
+					<input id="remember" name="remember" type="checkbox" checked="checked" class="filled-in">
 					<label for="remember">Se souvenir de moi</label>
 				</p>
 			</div>
