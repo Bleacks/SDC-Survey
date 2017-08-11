@@ -20,7 +20,6 @@ CREATE TABLE GenericSurvey(
         Title           Varchar (100) ,
         Description     Varchar (100) ,
         More            Varchar (250) ,
-        LifespanUnit    Varchar (10) ,
         Lifespan        Int ,
         SubmissionLimit Int ,
         PRIMARY KEY (idGS ) ,
@@ -34,10 +33,13 @@ CREATE TABLE GenericSurvey(
 
 CREATE TABLE GenericQuestion(
         idGQ     int (11) Auto_increment  NOT NULL ,
-        Question Varchar (100) ,
+        Text     Varchar (100) ,
+        Required Bool ,
+        Other    Bool ,
+        Type     Int ,
         idGS     Int ,
         PRIMARY KEY (idGQ ) ,
-        INDEX (Question )
+        INDEX (Text )
 )ENGINE=InnoDB;
 
 
@@ -46,11 +48,11 @@ CREATE TABLE GenericQuestion(
 #------------------------------------------------------------
 
 CREATE TABLE GenericAnswer(
-        idGA   int (11) Auto_increment  NOT NULL ,
-        Answer Varchar (50) ,
-        idGQ   Int ,
+        idGA int (11) Auto_increment  NOT NULL ,
+        Text Varchar (50) ,
+        idGQ Int ,
         PRIMARY KEY (idGA ) ,
-        INDEX (Answer )
+        INDEX (Text )
 )ENGINE=InnoDB;
 
 
@@ -172,14 +174,38 @@ ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idS FOREIGN KEY (idS) REFERENCES S
 ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGA FOREIGN KEY (idGA) REFERENCES GenericAnswer(idGA);
 
 
+
 #############################################################
 # Testing values
 #############################################################
 
-INSERT INTO `genericsurvey` (`idGS`, `Title`, `Description`, `More`, `LifespanUnit`, `Lifespan`, `SubmissionLimit`) VALUES
-(1, 'Illimité', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une journée', 'dd', '1', '0'),
-(2, 'Cinq', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une journée et limité à 5 soumissions', 'dd', '1', '5'),
-(3, 'Unique', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont quotidienne et uniques', 'dd', '1', '1');
+INSERT INTO `genericsurvey` (`idGS`, `Title`, `Description`, `More`, `Lifespan`, `SubmissionLimit`) VALUES
+(1, 'Illimité', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une journée', 7, 0),
+(2, 'Cinq', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une journée et limité à 5 soumissions', 7, 5),
+(3, 'Unique', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont quotidienne et uniques', 7, 1);
+
+INSERT INTO `genericquestion` (`idGQ`, `Text`, `Other`, `Type`, `idGS`) VALUES
+(1, 'Quand avez-vous travaillé ?', 1, 1, 1),
+(2, 'Combien de temps avez-vous travaillé ?', 1, 2, 1),
+(3, 'A quel moment de la journée avez-vous travaillé ?', 0, 1, 1),
+(4, 'Quels outils avez-vous utilisés ?', 1, 3, 1);
+
+INSERT INTO `genericanswer` (`idGA`, `Text`, `idGQ`) VALUES
+(1, 'Matin', 1),
+(2, 'Midi', 1),
+(3, 'Soir', 1),
+(4, 'Nuit', 1),
+(5, 'Une heure', 2),
+(6, 'Deux heures', 2),
+(7, 'Matin', 3),
+(8, 'Après-midi', 3),
+(9, 'Soir', 3),
+(10, 'Lumion', 4),
+(11, 'Dropbox', 4),
+(12, 'Illustrator', 4),
+(13, 'Téléphone', 4),
+(14, 'PowerPoint', 4),
+(15, 'Skype', 4);
 
 INSERT INTO `users` (`idU`, `FirstName`, `LastName`, `Email`, `Pass`, `City`, `Age`, `Status`, `Admin`, `idG`) VALUES
 (1, 'Test', 'User', 'test@user.fr', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', '1', 21, NULL, NULL, NULL),

@@ -158,6 +158,16 @@ class Database
 	}
 
 	/**
+	* Indicates if the User associated to this email is an admin or not
+	* @param string $email Email of the User
+	* @return bool True only if User is an admin
+	*/
+	public function isAdmin($email)
+	{
+		return $this->getUser($email)->Admin == 1;
+	}
+
+	/**
 	* Retrieves all the groups
 	* @return Object(ORM) All groups
 	*/
@@ -355,5 +365,15 @@ class Database
 	public function deleteConnectionToken($token)
 	{
 		return ORM::forTable('Token')->findOne($token)->delete();
+	}
+
+	/**
+	* Retrieves all possible answers for a given question
+	* @param int $questionId Id of the genericQuestion
+	* @return Object(ORM) List of possible answers to this question
+	*/
+	public function getAllAnswers($questionId)
+	{
+		return ORM::forTable('GenericAnswer')->where('idGQ', $questionId)->findMany();
 	}
 }

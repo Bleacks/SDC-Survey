@@ -54,9 +54,9 @@ session_start();
 
 $app->add(function(ServerRequestInterface $request, ResponseInterface $response, Callable $next) {
         $url = $request->getUri()->getPath();
-        $publicPaths = array('Connect', 'Subscribe', 'Recovery', 'Kill');
+        $publicPaths = array('Connect', 'Subscribe', 'Recovery', 'Kill', 'Test');
         // TODO: Retirer Test des URI autorisées
-        $privatePaths = array('', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword', 'Test');
+        $privatePaths = array('Home', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword', 'Test');
         $path = 'Connect';
         $code = 404;
 
@@ -65,9 +65,9 @@ $app->add(function(ServerRequestInterface $request, ResponseInterface $response,
 
 		if (in_array($url, $privatePaths))
 		{
+            $db = Database::getInstance();
             if (isset($_SESSION['token']))
             {
-                $db = Database::getInstance();
                 if ($db->verifyConnectionToken($_SESSION['token']))
                 {
                     return $next($request, $response);
@@ -90,8 +90,6 @@ $app->add(function(ServerRequestInterface $request, ResponseInterface $response,
         return $response->withRedirect($path, $code);
 });
 
-// NOTE: Main ne doit être utilisée que par les classes spécifiques, vers lesquelles Slim redirige
-
 
 
 $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response)
@@ -100,9 +98,8 @@ $app->get('/', function (ServerRequestInterface $request, ResponseInterface $res
 	/*$res = $response->withJson(var_dump('mot de passe'));
 	$hash = password_hash('mot de passe', PASSWORD_BCRYPT);
 	$res = $res->withJson(var_dump($hash));
-	$res = $res->withJson(var_dump(password_verify('mot de passe', $hash)));*/
-
-	// FIXME: Write test for the dateDiffNow function
+	$res = $res->withJson(var_dump(password_verify('mot de pass', $hash)));
+	*/
 	//return Main::workInProgressPage();
 });
 
@@ -174,7 +171,7 @@ $app->get('/Connect', function (ServerRequestInterface $request, ResponseInterfa
     $con = new Connect();
 	if (isset($_SESSION['token']))
 	{
-		return $response->withRedirect('Home');
+		return $response->withStatus('Home', 200);
 	}
 	else
 	{
@@ -412,12 +409,6 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 
 });
 
-$app->get('/Messages', function (ServerRequestInterface $request, ResponseInterface $response)
-{
-	//MailManager::testMailer();
-	return Main::workInProgressPage();
-});
-
 
 
 $app->get('/Kill', function (ServerRequestInterface $request, ResponseInterface $response)
@@ -430,7 +421,7 @@ $app->get('/Kill', function (ServerRequestInterface $request, ResponseInterface 
 
 $app->get('/Test', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-    $switch = 'ui';
+    /*$switch = 'ui';
     $val = 'ui';
     switch ($switch)
     {
@@ -457,6 +448,22 @@ $app->get('/Test', function (ServerRequestInterface $request, ResponseInterface 
     $values['Nouveau hash lu'] = $user->Pass;
     $values['Nouvelle verification'] = password_verify('azer2', $user->Pass);
     var_dump($values);
+    $main = new Main();
+    echo $main->generatePage('
+    <div class="s12">
+        <div class="row">
+            <p class="s6">
+                <input id="test" type="checkbox" name="checkbox" class="filled-in">
+                <label for="test">label</label>
+            </p>
+        </div>
+    </div>
+    ', array());*/
+    $array = array('test' => '');
+    var_dump($array['test']);
+    var_dump($array['plop']);
+    //echo password_hash('azer1', PASSWORD_BCRYPT);
+    //echo 'aaaaaaaaaaaa aaaaaaaaaaaaaa  '. (true ? 'test' : '') .'  aaaaaaaaaaaaaaaa aaaaaaaaaa';
 });
 
 
@@ -562,10 +569,25 @@ $app->get('/Surveys', function (ServerRequestInterface $request, ResponseInterfa
 
 $app->get('/Surveys/{survey}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
 {
-    $survey = new Survey();
-    $survey->submitSurvey($args['survey']);
-    $uri = $request->getUri()->withPath($this->router->pathFor('Surveys'));
-    //return $response->withRedirect((string)$uri);
+    $get = $request->getQueryParams();
+    if (isset($get['chips-data']) && !empty($get['chips-data']))
+    {
+        $answers = Database::getInstance()->getAllAnswers($get['chips-data']);
+        $chips = array();
+        foreach ($answers as $answer)
+        {
+            $chips[] = $answer->Text;
+        }
+        $code = (empty($chips)) ? 422 : 200;
+        $res = $response->withJson($chips, $code);
+    } else
+    {
+        $survey = new Survey();
+        $body = $response->getBody();
+        $body->write($survey->getSurvey($args['survey']));
+        $res = $response;
+    }
+    return $res;
 });
 
 
@@ -573,8 +595,8 @@ $app->get('/Surveys/{survey}', function (ServerRequestInterface $request, Respon
 $app->post('/Surveys/{survey}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
 {
     $survey = new Survey();
-    $survey->submitSurvey($args['survey']);
-    //return $survey->getSurvey($args['survey']);
+    //$survey->submitSurvey($args['survey']);
+    var_dump($request->getParsedBody());
 });
 
 
