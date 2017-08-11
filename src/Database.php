@@ -59,7 +59,7 @@ class Database
 			'PendingSub'		=> 'idPS',
 			'Groups'			=> 'idG',
 			'Token'				=> 'idT',
-			'Recovery'			=> 'code',
+			'Recovery'			=> 'Code',
 			'Iteration'			=> 'idIT',
 			'GenericSurvey'		=> 'idGS'
 		));
@@ -213,9 +213,8 @@ class Database
 	public function updatePassword($code, $password)
 	{
 		$recovery = ORM::forTable('Recovery')->findOne($code);
-		$user = ORM::forTable('Users')->findOne($recovery->idU);
-		$password = password_hash($password, PASSWORD_BCRYPT);
-		$user->Pass = $password;
+		$user = ORM::forTable('Users')->where('Email', $recovery->Email)->findOne();
+		$user->Pass = password_hash($password, PASSWORD_BCRYPT);
 		return $user->save();
 	}
 
@@ -226,8 +225,37 @@ class Database
 	*/
 	public function deleteRecovery($code)
 	{
-		$del_rec = ORM::forTable('Recovery')->where ('code',$code)->findOne();
-		return $del_rec->delete();
+		$recovery = ORM::forTable('Recovery')->findOne($code);
+		return $recovery->delete();
+	}
+
+
+	public function updateGroup($id, $group)
+	{
+		$user = ORM::forTable('Users')->findOne($id);
+		$user->idG = $group;
+		return $user->save();
+	}
+
+	public function updateAge($id, $age)
+	{
+		$user = ORM::forTable('Users')->findOne($id);
+		$user->Age = $age;
+		return $user->save();
+	}
+
+	public function updateCity($id, $city)
+	{
+		$user = ORM::forTable('Users')->findOne($id);
+		$user->City = $city;
+		return $user->save();
+	}
+
+	public function updateEmail($id, $email)
+	{
+		$user = ORM::forTable('Users')->findOne($id);
+		$user->Email = $email;
+		return $user->save();
 	}
 
 	// A REVOIRRRRRRR

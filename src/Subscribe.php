@@ -213,8 +213,8 @@ class Subscribe extends Main
 			<div class="input-field col s6">
 			  	<select id="city">
 					<option value="" disabled selected>Choisissez une ville</option>
-					<option value="1" >Liège</option>
-					<option value="2" >Nancy</option>
+					<option value="Liege" >Liège</option>
+					<option value="Nancy" >Nancy</option>
 			  	</select>
 				<label for="city"><p class="required_flag">*</p> Ville d\'étude</label>
 			</div>

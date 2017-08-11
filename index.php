@@ -127,12 +127,46 @@ $app->get('/Profile', function (ServerRequestInterface $request, ResponseInterfa
     return $response;
 });
 
-$app->put('/Profile', function (ServerRequestInterface $request, ResponseInterface $response)
+$app->post('/Profile', function (ServerRequestInterface $request, ResponseInterface $response)
 {
+    $post = $request->getParsedBody();
+	$db = Database::getInstance();
+    //$res = $response->withStatus(424);
+
+
+    $user = $db->getUser($_SESSION['email']);
+    $id = $user['idU'];
+    $group = $post['group'];
+    $age =  $post['age'];
+    $city = $post['city'];
+    $email = $post['email'];
+    //$res = $response->withJson(var_dump($post), 422);
+
+    if (isset($group) && isset($age) && isset($city) && isset($email) && $group !='' && $city != '' && $email != '')
+    {
+        if ($user['idG'] != $group ){
+            $db->updateGroup($id, $group);
+        //    $res = $response->withJson(var_dump(updateGroup($id, $group)));
+        }
+        if ($user['Age'] != $age){
+            $db->updateAge($id, $age);
+        }
+        if ($user['City'] != $city ){
+            $db->updateCity($id, $city);
+        }
+        if ($user['Email'] != $email){
+            $db->updateEmail($id, $email);
+        }
+        return $response->withStatus(200);
+    }
+    else
+    {
+        return $response->withStatus(424);
+    }
+
+
 
 });
-
-
 
 
 $app->get('/Connect', function (ServerRequestInterface $request, ResponseInterface $response)
@@ -355,8 +389,8 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 				$pw = htmlspecialchars($change_pw);
 				$pwc = htmlspecialchars($change_pwc);
 
-				$up_pass = $db->updatePassword($code,$pw);
-				$del_recovery = $db->deleteRecovery($code);
+			/*	$up_pass = $db->updatePassword($code,$pw);
+				$del_recovery = $db->deleteRecovery($code);*/
 
 				if ($up_pass != false && $del_recovery != false)
 				{

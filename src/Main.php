@@ -26,8 +26,8 @@ class Main
 	const SECONDARY_COLOR = 'orange lighten-1';
 
 	/** Pages listed on website and accessible
-	Sorted by acces right
-	Contains URI, Icon name and Displayed name in Nav Bar */
+	* Sorted by acces right
+	* Contains URI, Icon name and Displayed name in Nav Bar */
 	const ACCESSIBLE_PAGES = array(
 		'Connected' => array(
 			0 => array('', 'home', 'Accueil'),
