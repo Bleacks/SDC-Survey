@@ -24,14 +24,16 @@ class Profile extends Main {
                     $groupName = $groups[$i]->Name;
 		$content =
 		'
-    <h5>'.$user->FirstName.' '.$user->LastName.'</h5>
+    <h5 id="title"> Bienvenue '.$user->FirstName.' '.$user->LastName.' </h5>
+	<h5 id="title_modify" style="display:none;">Changer les informations de '.$user->FirstName.' '.$user->LastName.'</h5>
 
-    <div class="row">
+	<div class="row">
         <div class="input-field col s12">
-          <select id="loltuchangeras">
-            <option class="personnal-input" value="" disabled selected  >'.$groupName.'</option>';
+          <select class = "required validate" id="group" name="group">';
             foreach($groups as $group)
-                $content .= '<option value="'. $group->idG .'" >'. $group->Name .'</option>';
+			{
+				$content .= '<option value="'. $group->idG .'" '. ($user->idG == $group->idG ? 'selected' : '') .'>'. $group->Name .'</option>';
+			}
             $content .= '
           </select>
           <label>Groupe</label>
@@ -40,17 +42,18 @@ class Profile extends Main {
 
     <div class="row">
       <div class="input-field col s6">
-        <input class="personnal-input" disabled selected value="'.$user->Age.'" id="age" type="number" class="validate">
-        <label for="age">Age</label>
+        <input class="personnal-input required validate" disabled selected value="'.$user->Age.'" id="age" type="number" min="0" max="100" class="validate" name="age">
+        <label for="age" data-error="Age non valide" data-success="Age valide">Age</label>
       </div>
     </div>
 
     <div class="row">
         <div class="input-field col s12">
-          <select id="personnal-input">
-            <option class="personnal-input" value="" disabled selected  >'.$user->City.'</option>
-            <option value="Liege" >Liège</option>
-            <option value="Nancy" >Nancy</option>
+          <select class="required validate" id="city" name="city">';
+		  $isNancy = $user->City == 'Nancy';
+		  $content .= '
+		  	<option value="Nancy"  '. ($isNancy ? 'selected' : '') .'>Nancy</option>
+            <option value="Liege" '. ($isNancy ? '' : 'selected') .'>Liège</option>
           </select>
           <label>Ville</label>
         </div>
@@ -58,20 +61,20 @@ class Profile extends Main {
 
     <div class="row">
         <div class="input-field col s12">
-          <input class="personnal-input" disabled selected value="'.$user->Email.'"id="email" type="email" class="validate">
-          <label for="email" data-error="wrong" data-success="right">Email</label>
+          <input class="personnal-input required validate" disabled selected value="'.$user->Email.'"id="email" type="email" class="validate" name="email">
+          <label for="email" data-error="Adresse email non valide" data-success="Adresse email valide">Email</label>
         </div>
       </div>
 
-    <button id="password" class="btn waves-effect waves-light" type="submit" onclick="window.location=\'ChangePassword\'">Modifier le mot de passe
+	  <button id="modify" class="btn waves-effect waves-light" type="submit" onclick="allowChanges()">Changer les informations
+          <i class="material-icons right">send</i>
+      </button>
+
+	<button id="password" class="btn waves-effect waves-light right" type="submit" onclick="window.location=\'ChangePassword\'">Modifier le mot de passe
         <i class="material-icons right">send</i>
     </button>
 
-   <button id="modify" class="btn-floating btn-large red waves-effect right" onclick="allowChanges()">
-     <i class="large material-icons">mode_edit</i>
-   </button>
-
-   <button id="send" class="btn waves-effect waves-light disabled hide" type="submit" onclick="'.$onclickHandler.'">Enregistrer
+   <button id="send" class="btn waves-effect waves-light hide" type="submit" onclick="sendChangeInformation()">Enregistrer
        <i class="material-icons right">send</i>
    </button>';
 

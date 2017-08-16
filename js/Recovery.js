@@ -2,7 +2,7 @@ functions = (function()
 {
 	var mail = '';
 	var regex_mail = new RegExp('^([\\w\\-\\._]+\\@[\\w\\-_]+\\.[\\w\\-\\._]+)$');
-	
+
 	return {
 		/**
 		* Gather form's data and send it to the server using Ajax request
@@ -26,12 +26,12 @@ functions = (function()
 				type       : 'POST',
 				complete   : function (response)
 				{
-			
+
 			var notification = $('#notification');
 					notification.slideUp("fast");
 					//console.log(response);
 					//logError(response.responseText);
-					
+
 					switch (response.status)
 					{
 						case 200:
@@ -39,19 +39,19 @@ functions = (function()
 							notification.slideDown("slow", verifyFields);
 							$('#notification').removeClass('red').addClass('green');
 							break;
-							
+
 						case 424:	// TODO: Change notification's color and bring shawdow to it
 							message = 'Vous ne possedez pas de compte. Veuillez vous inscrire.';
 							$('#notification').removeClass('green').addClass('red');
 							notification.slideDown("slow", verifyFields);
 							break;
-							
+
 						case 403:
 							message = 'Votre réinitialisation de mot de passe a éxpiré, veuillez soumettre à nouveau votre adresse email.';
 							$('#notification').removeClass('green').addClass('red');
 							notification.slideDown("slow", verifyFields);
 							break;
-						
+
 						case 409:
 							message = 'Veuillez remplir tous les champs.';
 							break;
@@ -65,11 +65,11 @@ functions = (function()
 			});
 
 		},
-		
+
 		/**
-		* Used to unvalid form when error is received 
+		* Used to unvalid form when error is received
 		*/
-		
+
 		verifyFields: function verifyFields()
 		{
 			var email = $('#recovery_email').val().toLowerCase();
@@ -83,7 +83,7 @@ functions = (function()
 				$('.required').removeClass('valid').addClass('invalid');
 			}
 		},
-		
+
 		/**
 		* Used to allow user to submit form using Enter key
 		*/

@@ -252,7 +252,7 @@ class Main
    	protected function getButton($onclickHandler)
    	{
    	return '
-   	<button id="send" class="btn waves-effect waves-light disabled" type="submit" onclick="'.$onclickHandler.'">Envoyer
+   	<button id="send" class="btn waves-effect waves-light" type="submit" onclick="'.$onclickHandler.'">Envoyer
    		<i class="material-icons right">send</i>
    	</button>
    	<div>

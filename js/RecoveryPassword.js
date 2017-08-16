@@ -23,9 +23,9 @@
 	verifyPass();
 	verifyConf();
 	verifyOldPass();
-	
+
 //});
-	
+
     pass.on("input", function(e) {
 		 verifyPass();
     });
@@ -33,12 +33,12 @@
     conf.on("input", function(e) {
 		 verifyConf();
     });
-	
+
 	oldPass.on("input", function(e) {
 		 verifyOldPass();
     });
 
-	
+
 	function sendAjax(targetUrl, jsonData, onComplete)
 	{
 		$.ajax({
@@ -52,34 +52,31 @@
 	}
 
     function verifyButton() {
-		if (pass.isValid == true && conf.isValid == true && oldPass.isValid == true)
-			send.removeClass('disabled');
-		else
-			send.addClass('disabled');
+        $('#send').prop('disabled', !(pass.isValid && conf.isValid && oldPass.isValid));
     }
-	
+
 	function onRecoveryComplete(response)
 	{
 		var notification = $('#notification');
 		notification.slideUp("fast");
-		//console.log(response);
-		//logError(response.responseText);
-		
+		console.log(response);
+		logError(response.responseText);
+
 		switch (response.status)
 		{
 			case 200:
-				message = 'Votre mot de passe a bien été modifié. ';
+				message = 'Votre mot de passe a bien été modifié. Vous allez être redirigé vers la page de connexion. ';
 				notification.slideDown("slow", verifyButton);
 				$('#notification').removeClass('red').addClass('green');
-				setTimeout(function(){ window.location = 'Connect';; }, 2000);
+                setTimeout(function(){ window.location = JSON.parse(response.responseText); }, 2000);
 				break;
-				
+
 			case 409:	// TODO: Change notification's color and bring shawdow to it
 				message = 'Une erreur s\'est produite.';
 				$('#notification').removeClass('green').addClass('red');
 				notification.slideDown("slow", verifyButton);
 				break;
-				
+
 			case 424:	// TODO: Change notification's color and bring shawdow to it
 				message = 'Une erreur s\'est produite, veuillez recommencer.';
 				$('#notification').removeClass('green').addClass('red');
@@ -97,24 +94,24 @@
 	{
 		var notification = $('#notification');
 		notification.slideUp("fast");
-		//console.log(response);
-		//logError(response.responseText);
-		
+		console.log(response);
+		logError(response.responseText);
+
 		switch (response.status)
 		{
 			case 200:
 				message = 'Votre mot de passe a bien été modifié. ';
 				notification.slideDown("slow", verifyButton);
 				$('#notification').removeClass('red').addClass('green');
-				setTimeout(function(){ window.location = 'Connect';; }, 2000);
+				//setTimeout(function(){ window.location = 'Connect'; }, 2000);
 				break;
-				
+
 			case 409:	// TODO: Change notification's color and bring shawdow to it
-				message = 'Une erreur s\'est produite.';
+				message = 'Votre ancien mot de passe est incorrect.';
 				$('#notification').removeClass('green').addClass('red');
 				notification.slideDown("slow", verifyButton);
 				break;
-				
+
 			case 424:	// TODO: Change notification's color and bring shawdow to it
 				message = 'Une erreur s\'est produite, veuillez recommencer.';
 				$('#notification').removeClass('green').addClass('red');
@@ -145,7 +142,7 @@
 		   invalidConf();
 		clean(conf);
     }
-	
+
 	function verifyOldPass() {
 		var value = oldPass.val();
 		if (regex_pass.test(value))
@@ -172,7 +169,7 @@
 		else
 		   validInput(conf);
     }
-	
+
 	 function validOldPass() {
 		validInput(oldPass);
     }
@@ -184,7 +181,7 @@
     function invalidConf() {
       	invalidInput(conf);
     }
-	
+
 	function invalidOldPass() {
 		invalidInput(oldPass);
     }
@@ -207,9 +204,9 @@
 			sendRecoveryRequest();
 			//sendChangePasswordRequest();
 		}
-			
+
 	});
-	
+
 // TODO: Add tooltips on hover for each fields of the form, displaying validation condition
    /*
    $('.tooltipped').on("focusin", function(){
@@ -223,7 +220,7 @@
 		};
 		sendAjax('Recovery/' + code, jsonData, onRecoveryComplete);
 	}
-	
+
 	function sendChangePasswordRequest()
 	{
 		var jsonData = {
@@ -233,4 +230,3 @@
 		};
 		sendAjax('ChangePassword', jsonData, onChangePasswordComplete);
 	}
-
