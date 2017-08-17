@@ -56,7 +56,7 @@ $app->add(function(ServerRequestInterface $request, ResponseInterface $response,
         $url = $request->getUri()->getPath();
         $publicPaths = array('Connect', 'Subscribe', 'Recovery', 'Kill', 'Test');
         // TODO: Retirer Test des URI autorisées
-        $privatePaths = array('Home', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword', 'Test');
+        $privatePaths = array('Home', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword');
         $path = 'Connect';
         $code = 404;
 
@@ -88,6 +88,22 @@ $app->add(function(ServerRequestInterface $request, ResponseInterface $response,
                 $path = $request->getUri()->getBasePath();
         }
         return $response->withRedirect($path, $code);
+});
+
+
+
+$app->get('/Test', function (ServerRequestInterface $request, ResponseInterface $response)
+{
+    #####################################################
+    ##                      TEST                       ##
+    #####################################################
+
+
+
+    /*$user = ORM::forTable('Users')->create();
+    var_dump($user);
+    $user->save();
+    var_dump($user);*/
 });
 
 
@@ -124,23 +140,64 @@ $app->get('/Profile', function (ServerRequestInterface $request, ResponseInterfa
     return $response;
 });
 
-$app->put('/Profile', function (ServerRequestInterface $request, ResponseInterface $response)
+$app->post('/Profile', function (ServerRequestInterface $request, ResponseInterface $response)
 {
+    $post = $request->getParsedBody();
+	$db = Database::getInstance();
+    $res = $response->withStatus(200);
+
+    $user = $db->getUser($_SESSION['email']);
+    $id = $user['idU'];
+    $group = $post['group'];
+    $age =  $post['age'];
+    $city = $post['city'];
+    $email = $post['email'];
+    //$res = $response->withJson(var_dump($post), 422);
+
+    if (isset($group) && isset($age) && isset($city) && isset($email) && $group !='' && $age != '' && $city != '' && $email != '')
+    {
+        if ($user['idG'] != $group ){
+            $db->updateGroup($id, $group);
+        //    $res = $response->withJson(var_dump(updateGroup($id, $group)));
+        }
+        if ($user['Age'] != $age){
+            $db->updateAge($id, $age);
+        }
+        if ($user['City'] != $city ){
+            $db->updateCity($id, $city);
+        }
+        if ($user['Email'] != $email){
+            if ($db->getUser($email) == false)
+            {
+                //$res =$response->withJson(var_dump(getUser($email)));
+                $db->updateEmail($id, $email);
+                $res = $response->withStatus(200);
+            }
+            else
+            {
+                $res = $response->withStatus(409);
+            }
+        }
+    }
+    else
+    {
+        $res =  $response->withStatus(424);
+    }
+
+    return $res;
 
 });
 
 
-
-
 $app->get('/Connect', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-    $con = new Connect();
 	if (isset($_SESSION['token']))
 	{
-		return $response->withStatus('Home', 200);
+		return $response->withRedirect('Home');
 	}
 	else
 	{
+        $con = new Connect();
 		return $con->getPageConnect();
 	}
 })->setName('auth');
@@ -275,6 +332,7 @@ $app->post('/Recovery/{code}', function(ServerRequestInterface $request, Respons
 	$db = Database::getInstance();
 	$code = $args['code'];
 	$err = array('error' => "");
+    $newUri = '';
 
 	if(isset($post['change_pw']) && isset ($post['change_pwc']) && $post['change_pw'] != '' && $post['change_pwc'] != '')
 	{
@@ -290,7 +348,15 @@ $app->post('/Recovery/{code}', function(ServerRequestInterface $request, Respons
 
 		if ($up_pass != false && $del_recovery != false)
 		{
-			$res = $response->withStatus(200);
+            if (isset ($_SESSION['token']))
+            {
+                $newUri = 'Disconnect';
+            }
+            else
+            {
+                $newUri = 'Connect';
+            }
+            $res = $response->withJson($newUri);
 		}
 		else
 		{
@@ -316,7 +382,6 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 {
 	$post = $request->getParsedBody();
 	$db = Database::getInstance();
-	$err = array('error' => "");
 	$res = $response->withStatus(424);
 
 	if (isset($post['old_pw']))
@@ -352,8 +417,8 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 				$pw = htmlspecialchars($change_pw);
 				$pwc = htmlspecialchars($change_pwc);
 
-				$up_pass = $db->updatePassword($code,$pw);
-				$del_recovery = $db->deleteRecovery($code);
+			/*$up_pass = $db->updatePassword($code,$pw);
+				$del_recovery = $db->deleteRecovery($code);*/
 
 				if ($up_pass != false && $del_recovery != false)
 				{
@@ -361,12 +426,12 @@ $app->post('/ChangePassword', function(ServerRequestInterface $request, Response
 				}
 				else
 				{
-					$res = $response->withJson($err, 424);
+					$res = $response->withStatus(424);
 				}
 			}
 			else
 			{
-				$res = $response->withJson($err, 409);
+				$res = $response->withStatus(409);
 			}
 		}
 		//$res = $response->withJson(var_dump($choses));
@@ -381,23 +446,6 @@ $app->get('/Kill', function (ServerRequestInterface $request, ResponseInterface 
 {
     session_destroy();
     session_unset();
-});
-
-
-
-$app->get('/Test', function (ServerRequestInterface $request, ResponseInterface $response)
-{
-    #####################################################
-    ##                      TEST                       ##
-    #####################################################
-
-
-
-    /*$user = ORM::forTable('Users')->create();
-    var_dump($user);
-    $user->save();
-    var_dump($user);*/
-
 });
 
 
@@ -598,7 +646,7 @@ $app->post('/Surveys/{survey}', function (ServerRequestInterface $request, Respo
 
 $app->get('/Disconnect', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-	if (isset($_SESSION['token']))
+    if (isset($_SESSION['token']))
 	{
 		$db = Database::getInstance();
 		$db->deleteConnectionToken($_SESSION['token']);
@@ -606,9 +654,11 @@ $app->get('/Disconnect', function (ServerRequestInterface $request, ResponseInte
 	session_unset();
 	session_destroy();
 	sleep(1);
+    //var_dump($_SESSION);
+    //exit(1);
+
 	return $response->withRedirect('Connect');
 });
-
 
 
 $app->run();

@@ -26,8 +26,8 @@ class Main
 	const SECONDARY_COLOR = 'orange lighten-1';
 
 	/** Pages listed on website and accessible
-	Sorted by acces right
-	Contains URI, Icon name and Displayed name in Nav Bar */
+	* Sorted by acces right
+	* Contains URI, Icon name and Displayed name in Nav Bar */
 	const ACCESSIBLE_PAGES = array(
 		'Connected' => array(
 			0 => array('Home', 'home', 'Accueil'),
@@ -252,7 +252,7 @@ class Main
    	protected function getButton($onclickHandler)
    	{
    	return '
-   	<button id="send" class="btn waves-effect waves-light disabled" type="submit" onclick="'.$onclickHandler.'">Envoyer
+   	<button id="send" class="btn waves-effect waves-light" type="submit" onclick="'.$onclickHandler.'">Envoyer
    		<i class="material-icons right">send</i>
    	</button>
    	<div>
