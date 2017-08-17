@@ -22,20 +22,14 @@ $(document).ready(function() {
 	verifyPass();
 	verifyConf();
 
-	mail.on("input", function(e) {
-		verifyMail();
-	});
+	mail.on("input", verifyMail);
 
-    pass.on("input", function(e) {
-		 verifyPass();
-    });
+    pass.on("input", verifyPass);
 
-    conf.on("input", function(e) {
-		 verifyConf();
-    });
+    conf.on("input", verifyConf);
 
     function verifyButton() {
-		if (pass.isValid == true && conf.isValid == true && mail.isValid == true)
+		if (pass.isValid && conf.isValid && mail.isValid)
 			send.removeClass('disabled');
 		else
 			send.addClass('disabled');

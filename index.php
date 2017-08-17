@@ -387,49 +387,17 @@ $app->get('/Kill', function (ServerRequestInterface $request, ResponseInterface 
 
 $app->get('/Test', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-    /*$switch = 'ui';
-    $val = 'ui';
-    switch ($switch)
-    {
-        case 1:
-            break;
-        case $val:
-            var_dump('Les switch avec "case $val:" fonctionnent');
-            break;
-        default:
-            break;
-    }
-    var_dump(password_hash('azer1', PASSWORD_BCRYPT));
-    var_dump($_SESSION);
-    $user = Database::getInstance()->getUser($_SESSION['email']);
-    $values = array();
-    $mdp = 'azer2';
-    $values['Vérfication mot de passe'] = password_verify('azer1', '$2y$10$8VysYMpTUn/pDBHELLB5EuJZWCWdbfQYc5Qx9/maqGb.eF7N0BtPC');
-    $values['Mot de passe de départ'] = $user->Pass;
-    $values['Nouveau mot de passe'] = $mdp;
-    $user->Pass = password_hash($mdp, PASSWORD_BCRYPT);
-    $values['Nouveau hash'] = $user->Pass;
+    #####################################################
+    ##                      TEST                       ##
+    #####################################################
+
+
+
+    /*$user = ORM::forTable('Users')->create();
+    var_dump($user);
     $user->save();
-    $user = Database::getInstance()->getUser($_SESSION['email']);
-    $values['Nouveau hash lu'] = $user->Pass;
-    $values['Nouvelle verification'] = password_verify('azer2', $user->Pass);
-    var_dump($values);
-    $main = new Main();
-    echo $main->generatePage('
-    <div class="s12">
-        <div class="row">
-            <p class="s6">
-                <input id="test" type="checkbox" name="checkbox" class="filled-in">
-                <label for="test">label</label>
-            </p>
-        </div>
-    </div>
-    ', array());*/
-    $array = array('test' => '');
-    var_dump($array['test']);
-    var_dump($array['plop']);
-    //echo password_hash('azer1', PASSWORD_BCRYPT);
-    //echo 'aaaaaaaaaaaa aaaaaaaaaaaaaa  '. (true ? 'test' : '') .'  aaaaaaaaaaaaaaaa aaaaaaaaaa';
+    var_dump($user);*/
+
 });
 
 
@@ -532,17 +500,21 @@ $app->get('/Surveys', function (ServerRequestInterface $request, ResponseInterfa
 })->setName('Surveys');
 
 
-
+// FIXME: Verifier que le survey n'a pas atteint la limite cette iteration
 $app->get('/Surveys/{survey}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
 {
     $get = $request->getQueryParams();
+    $db = Database::getInstance();
     if (isset($get['chips-data']) && !empty($get['chips-data']))
     {
-        $answers = Database::getInstance()->getAllAnswers($get['chips-data']);
+        $answers = $db->getAllAnswers($get['chips-data']);
         $chips = array();
         foreach ($answers as $answer)
         {
-            $chips[] = $answer->Text;
+            $chip = array();
+            $chip['tag'] = $answer->Text;
+            $chip['id'] = $answer->idGA;
+            $chips[] = $chip;
         }
         $code = (empty($chips)) ? 422 : 200;
         $res = $response->withJson($chips, $code);
@@ -550,7 +522,7 @@ $app->get('/Surveys/{survey}', function (ServerRequestInterface $request, Respon
     {
         $survey = new Survey();
         $body = $response->getBody();
-        $body->write($survey->getSurvey($args['survey']));
+        $body->write($survey->getSurvey($args['survey'], $db->getUser($_SESSION['email'])));
         $res = $response;
     }
     return $res;
@@ -561,8 +533,65 @@ $app->get('/Surveys/{survey}', function (ServerRequestInterface $request, Respon
 $app->post('/Surveys/{survey}', function (ServerRequestInterface $request, ResponseInterface $response, $args)
 {
     $survey = new Survey();
-    //$survey->submitSurvey($args['survey']);
-    var_dump($request->getParsedBody());
+    $post = $request->getParsedBody();
+    $db = Database::getInstance();
+    $user = $db->getUser($_SESSION['email']);
+    $genericSurvey = $db->findGenericSurvey($args['survey']);
+    $survey = $db->createEmptySurvey();
+    $res = $response->withStatus(424);
+    $document;
+
+    $res = $response->withJson(var_dump($post));
+    // TODO: Test with new value with same Text but for different questions
+    // TODO: Refactor DB in order to store personnal answer in another place
+    // TODO: Automatically add new genericAnswer for every new user (group)
+
+    foreach ($post as $questionId => $answers)
+    {
+        $genericQuestion = $db->findGenericQuestion($questionId);
+        if ($genericQuestion->idGS == $genericSurvey->idGS)
+        {
+            foreach ($answers as $answer)
+            {
+                $res = $response->withJson(var_dump(array($answer, $genericQuestion->Type)));
+                $genericAnswer = false;
+                $text = '';
+                if ($genericQuestion->Type == 3)    // Chip
+                {
+                    //$genericAnswer = $db->findGenericAnswerByText($answer, 3);
+                    $genericAnswer = $db->findGenericAnswer($answer, $genericQuestion->idGQ);
+                    $text = 'Existing Chip';
+                    if (!$genericAnswer)            // Creating new Answer
+                    {
+                        $text = 'New chip';
+                        $genericAnswer = $db->createGenericAnswer($genericQuestion->idGQ, $answer);
+                    }
+                    $db->createAnswer($genericQuestion->idGQ, $survey->idS, $genericAnswer->idGA);
+                } else                              // GenericAnswer
+                {
+                    if ($genericQuestion->Type == 6)
+                        $document = $answer;
+                    else
+                    {
+                        $genericAnswer = $db->findGenericAnswer($answer, $genericQuestion->idGQ);
+                        $text = 'Existing answer';
+                        if (!$genericAnswer)            // Creating new Answer
+                        {
+                            $text = 'New answer';
+                            $genericAnswer = $db->createGenericAnswer(null, $answer);
+                        }
+                        $db->createAnswer($genericQuestion->idGQ, $survey->idS, $genericAnswer->idGA);
+                    }
+                }
+                //$res = $response->withJson(var_dump(array($genericQuestion->idGQ, $text)));
+            }
+            $iteration = $db->findCurrentIteration($genericSurvey);
+
+            if ($db->submitSurvey($survey, $document, $user->idU, $iteration->idIT))
+                $res = $res->withStatus(200);
+        }
+    }
+    return $res;
 });
 
 
