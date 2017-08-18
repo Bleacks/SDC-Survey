@@ -30,12 +30,10 @@ class Main
 	* Contains URI, Icon name and Displayed name in Nav Bar */
 	const ACCESSIBLE_PAGES = array(
 		'Connected' => array(
-			0 => array('Home', 'home', 'Accueil'),
-			1 => array('Demo', 'ondemand_video', 'Démonstration'),
-			2 => array('Surveys', 'assignment', 'Questionnaires'),
-			3 => array('Profile', 'account_box', 'Profil'),
-			4 => array('ChangePassword', 'cached', 'Changer le mot de passe'),
-			5 => array('Disconnect', 'launch', 'Déconnexion')
+			0 => array('Surveys', 'assignment', 'Questionnaires'),
+			1 => array('Profile', 'account_box', 'Profil'),
+			2 => array('ChangePassword', 'cached', 'Changer le mot de passe'),
+			3 => array('Disconnect', 'launch', 'Déconnexion')
 		),
 		'Disconnected' => array(
 			0 => array('Connect', 'input', 'Connexion'),
@@ -49,8 +47,7 @@ class Main
    */
    function __construct()
    {
-      // TODO: Revoir l'architecture de la classe
-      // TODO: Gestion hierachisée des erreurs pour factoriser au maximum les constantes
+
    }
 
    	/**
@@ -127,20 +124,6 @@ class Main
 	</div>
 </header>';
 		return $header;
-   }
-
-   /**
-   * Example of Chips usage
-   * @return (String):Computed content
-   */
-   private function demoContent()
-   {
-      // TODO: Séparer les méthodes spécifiques aux pages dans des classes spécifiques
-      return '
-<div class="chips chips-placeholder chips-autocomplete chips-initial" data-index="0" data-initialized="true">
-	<input id="e2b78123-5a53-e67d-d60c-8293d451905a" class="input" placeholder="">
-	<ul class="autocomplete-content dropdown-content"></ul>
-</div>';
    }
 
    /**

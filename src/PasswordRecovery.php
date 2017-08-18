@@ -2,16 +2,17 @@
 
 Namespace Src;
 
-/* Form to to get the email of the user to be able to send him a code to update pw
-and form to get the his new password*/
-
 class PasswordRecovery extends Main {
 
 	public function __construct()
 	{
 
 	}
-	// Form to get the email
+
+	/**
+	* Form to get the email of the user to be able to send him a code to update his password
+	* @return String the page with the email form
+	*/
 
 	public function getPageFormRecoveryEmail()
 	{
@@ -36,23 +37,10 @@ class PasswordRecovery extends Main {
 		return parent::generatePage($content, array('Recovery'));
 	}
 
-	// Form to change password (forget password)
-
-	public function getPageFormRecoveryPw ()
-	{
-
-		/*<?php  if($section == "changepw") { ?> Nouveau mot de passe pour <?= $_SESSION['recovery_email'] ?>*/
-
-		$content ='
-		<div>
-			<h5> Mot de passe oublié </h5></br>
-			'. $this->getFormNewPassword('sendRecoveryRequest()');
-
-		return parent::generatePage($content, array('RecoveryPassword'));
-	}
-
-	// function used in forget password and change password
-
+	/**
+	* Form of new password and confirm password used in two function getPageFormRecoveryPw() and getFormChangePassword()
+	* @return String of the form
+	*/
 	public function getFormNewPassword($listener)
 	{
 		$content =
@@ -78,8 +66,26 @@ class PasswordRecovery extends Main {
 		return $content;
 	}
 
-	//Form to change the password
+	/**
+	* Form to change user password when he forget it
+	* @return the page with a form to change his password
+	*/
+	public function getPageFormRecoveryPw ()
+	{
+		$content ='
+		<div>
+			<h5> Mot de passe oublié </h5></br>
+			'. $this->getFormNewPassword('sendRecoveryRequest()');
 
+		return parent::generatePage($content, array('RecoveryPassword'));
+	}
+
+
+
+	/**
+	* Form to change user password when he wants to change it
+	* @return the page with a form to change his password
+	*/
 	public function getFormChangePassword()
 	{
 		$content =
