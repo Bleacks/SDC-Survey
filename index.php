@@ -56,8 +56,8 @@ $app->add(function(ServerRequestInterface $request, ResponseInterface $response,
         $url = $request->getUri()->getPath();
         $publicPaths = array('Connect', 'Subscribe', 'Recovery', 'Kill', 'Test');
         // TODO: Retirer Test des URI autorisées
-        $privatePaths = array('Home', 'Demo', 'Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword');
-        $path = 'Connect';
+        $privatePaths = array('Surveys', 'Profile', 'Reset', 'Disconnect', 'ChangePassword');
+        $path = $request->getUri()->getBasePath().'/Connect';
         $code = 404;
 
 		if (strpos($url, '/') !== false)
@@ -76,8 +76,8 @@ $app->add(function(ServerRequestInterface $request, ResponseInterface $response,
                     unset($_SESSION['token']);
                 }
             }
+            $_SESSION['url'] = $request->getUri()->getPath();
 
-            $_SESSION['url'] = $url;
             $code = 403;
 		} else
         {
@@ -110,20 +110,8 @@ $app->get('/Test', function (ServerRequestInterface $request, ResponseInterface 
 
 $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response)
 {
-
-	/*$res = $response->withJson(var_dump('mot de passe'));
-	$hash = password_hash('mot de passe', PASSWORD_BCRYPT);
-	$res = $res->withJson(var_dump($hash));
-	$res = $res->withJson(var_dump(password_verify('mot de pass', $hash)));
-	*/
-	//return Main::workInProgressPage();
-});
-
-
-$app->get('/Demo', function (ServerRequestInterface $request, ResponseInterface $response)
-{
-   $main = new Main();
-   return $main->generateDemo();
+    $path = $request->getUri()->getBasePath(). '/Surveys';
+    return $response->withRedirect($path, 200);
 });
 
 
@@ -193,7 +181,7 @@ $app->get('/Connect', function (ServerRequestInterface $request, ResponseInterfa
 {
 	if (isset($_SESSION['token']))
 	{
-		return $response->withRedirect('Home');
+		return $response->withRedirect('Surveys');
 	}
 	else
 	{
@@ -226,8 +214,11 @@ $app->post('/Connect', function (ServerRequestInterface $request, ResponseInterf
 				}
 				else // Deletes eventual existing cookie
 				{
-					$db->deleteConnectionToken($_SESSION['token']);
-					unset($_SESSION['token']);
+                    if ($_SESSION['token'])
+                    {
+                        unset($_SESSION['token']);
+                        $db->deleteConnectionToken($_SESSION['token']);
+                    }
 				}
 				$res = $response->withStatus(200);
 				$_SESSION['email'] = $user->Email;
@@ -589,10 +580,8 @@ $app->post('/Surveys/{survey}', function (ServerRequestInterface $request, Respo
     $res = $response->withStatus(424);
     $document;
 
-    $res = $response->withJson(var_dump($post));
+    //$res = $response->withJson(var_dump($post));
     // TODO: Test with new value with same Text but for different questions
-    // TODO: Refactor DB in order to store personnal answer in another place
-    // TODO: Automatically add new genericAnswer for every new user (group)
 
     foreach ($post as $questionId => $answers)
     {

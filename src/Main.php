@@ -47,8 +47,7 @@ class Main
    */
    function __construct()
    {
-      // TODO: Revoir l'architecture de la classe
-      // TODO: Gestion hierachisée des erreurs pour factoriser au maximum les constantes
+
    }
 
    	/**
@@ -125,20 +124,6 @@ class Main
 	</div>
 </header>';
 		return $header;
-   }
-
-   /**
-   * Example of Chips usage
-   * @return (String):Computed content
-   */
-   private function demoContent()
-   {
-      // TODO: Séparer les méthodes spécifiques aux pages dans des classes spécifiques
-      return '
-<div class="chips chips-placeholder chips-autocomplete chips-initial" data-index="0" data-initialized="true">
-	<input id="e2b78123-5a53-e67d-d60c-8293d451905a" class="input" placeholder="">
-	<ul class="autocomplete-content dropdown-content"></ul>
-</div>';
    }
 
    /**

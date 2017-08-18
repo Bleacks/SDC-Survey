@@ -118,8 +118,9 @@ functions = (function()
 			var age = '';
 			var city = '';
 
-			return function(token)
+			return function()
 			{
+				var token = window.location.href.split('/').slice(-1)[0];
 				var newFirst = $('#first_name').val();
 				var newLast = $('#last_name').val();
 				var newAge = $('#age').val();

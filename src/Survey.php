@@ -172,7 +172,7 @@ class Survey extends Main
                 $content .= '
                 <div class="row">
                 '.$this->generateQuestionTitle($question).'
-                    <div class="hide-on-med-and-down col s12">';
+                    <div class=" col s12">';
                 switch($question->Type)
                 {
                     case '1':   // Multiple choice (Checkbox)
@@ -241,7 +241,7 @@ class Survey extends Main
         // TODO: Refactor this one and generateCheckboxElement to use a common private function
 
         $content = '
-        <p class="col s6">
+        <p class="col s12 m6">
             <input id="'. $answer['idGA'] .'" answersto="'. $answer['idGQ'] .'" type="checkbox" name="'. $answer['Text'] .'" class="filled-in">
             <label for="'. $answer['idGA'] .'">'. $answer['Text'] .'</label>
         </p>';
@@ -300,7 +300,7 @@ class Survey extends Main
     private function generateCheckboxElement($answer)
     {
         $content = '
-        <p class="col s6">
+        <p class="col s12 m6">
             <input id="'. $answer['idGA'] .'" answersto="'. $answer['idGQ'] .'" type="checkbox" name="'. $answer['idGA'] .'" class="filled-in">
             <label for="'. $answer['idGA'] .'">'. $answer['Text'] .'</label>
         </p>';
@@ -382,7 +382,7 @@ class Survey extends Main
     private function generateRadioElement($answer)
     {
         $content = '
-        <p class="col s6">
+        <p class="col s12 m6">
             <input value="'. $answer['idGA'] .'" class="with-gap" name="'. $answer['idGQ'] .'" answersto="'. $answer['idGQ'] .'" type="radio" id="'. $answer['idGA'] .'" />
             <label for="'. $answer['idGA'] .'">'. $answer['Text'] .'</label>
         </p>';

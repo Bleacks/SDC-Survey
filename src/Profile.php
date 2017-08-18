@@ -41,7 +41,7 @@ class Profile extends Main {
     </div>
 
     <div class="row">
-      <div class="input-field col s6">
+      <div class="input-field col s6 s12">
         <input class="personnal-input required validate" disabled selected value="'.$user->Age.'" id="age" type="number" min="0" max="100" class="validate" name="age">
         <label for="age" data-error="Age non valide" data-success="Age valide">Age</label>
       </div>

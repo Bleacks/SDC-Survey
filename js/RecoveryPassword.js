@@ -8,8 +8,8 @@
     var conf = $('#change_pwc');
     var send = $('#send');
 	var i = 0;
-	//var regex_pass = new RegExp("^(?=.*[a-zA-Z])(?=.*[0-9]).{5,25}$");
-    var regex_pass = new RegExp("^[A-Za-z0-9,;:!\/\*$&-+]{5,25}$");
+	var regex_pass = new RegExp("^(?=.*[a-zA-Z])(?=.*[0-9]).{5,25}$");
+    //var regex_pass = new RegExp("^[A-Za-z0-9,;:!\/\*$&-+]{5,25}$");
 	//var regex_pass2 = new RegExp("^.*[0-9].*$");
 	var code = window.location.href.split('/').slice(-1)[0];
 

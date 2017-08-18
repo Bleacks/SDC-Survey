@@ -31,15 +31,16 @@ functions = (function()
 				type       : 'POST',
 				complete   : function (response)
 				{
-					console.log(response);
+					//console.log(response);
 					//$('main').append(response.responseText);
 					var notification = $('#notification');
-					notification.slideUp("fast");
-					var location = 'Home';
-					if (response.responseText != '')
+					notification.slideUp('fast');
+					var location = 'Surveys';
+					var message;
+					if (response.responseJSON != '')
 					{
-						var json = JSON.parse(response.responseText);
-						if (json.hasOwnProperty('url'))
+						var json = response.responseJSON;
+						if (json != undefined && json.hasOwnProperty('url'))
 						{
 							location = json['url'];
 						}
@@ -52,7 +53,7 @@ functions = (function()
 
 						case 422:	// TODO: Change notification's color and bring shawdow to it
 							message = 'Combinaison Email/Mot de passe inexistante';
-							notification.slideDown("slow", verifyFields);
+							notification.slideDown('slow', verifyFields);
 							break;
 
 						case 500:
@@ -63,7 +64,8 @@ functions = (function()
 							message = 'Unhandled exception';
 							break;
 					}
-					$('#notification_text').text(message);
+					if (message != undefined)
+						$('#notification_text').text(message);
 				}
 			});
 

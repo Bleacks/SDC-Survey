@@ -40,11 +40,10 @@ class Connect extends Main {
 					<input id="password" type="password" class="required valid" value="azer1">
 					<label for="password"><p class="required_flag">*</p> Password</label>
 				</div>
-				<a href="Recovery"> Mot de passe oublié? </a>'./*
-				<p class="col s12">
+				<p class="col s12" hidden>
 					<input id="remember" name="remember" type="checkbox" checked="checked" class="filled-in">
 					<label for="remember">Se souvenir de moi</label>
-				</p>*/'
+				</p>
 			</div>
 		  '.
 		  parent::getButton('connectUser()')
