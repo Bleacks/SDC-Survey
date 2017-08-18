@@ -14,13 +14,14 @@ USE sdc;
 #------------------------------------------------------------
 # Table: GenericSurvey
 #------------------------------------------------------------
-# REMEMBER TO CHANGE THE CONST `FIELDS_LENGTH` IN Database.php ACCORDING TO THESE ONE
 
 CREATE TABLE GenericSurvey(
         idGS            int (11) Auto_increment  NOT NULL ,
         Title           Varchar (100) ,
         Description     Varchar (100) ,
         More            Varchar (250) ,
+        OpenAt          Datetime ,
+        Repetitions     Int ,
         Lifespan        Int ,
         SubmissionLimit Int ,
         PRIMARY KEY (idGS ) ,
@@ -35,9 +36,9 @@ CREATE TABLE GenericSurvey(
 CREATE TABLE GenericQuestion(
         idGQ     int (11) Auto_increment  NOT NULL ,
         Text     Varchar (100) ,
-        Required Bool ,
         Other    Bool ,
         Type     Int ,
+        Required Bool ,
         idGS     Int ,
         PRIMARY KEY (idGQ ) ,
         INDEX (Text )
@@ -180,11 +181,11 @@ ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGA FOREIGN KEY (idGA) REFERENCES
 # Testing values
 #############################################################
 
-INSERT INTO `genericsurvey` (`idGS`, `Title`, `Description`, `More`, `Lifespan`, `SubmissionLimit`) VALUES
-(1, 'Soumissions illimitées', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une semaine', 7, 0),
-(2, 'Cinq soumissions', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une semaine et limité à 5 soumissions', 7, 5),
-(3, 'Soumission unique', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont hedbomadaires et uniques', 7, 1),
-(4, 'Questionnaire - Travail collectif', 'Description', 'Détails', 7, 0);
+INSERT INTO `genericsurvey` (`idGS`, `Title`, `Description`, `More`, `Lifespan`, `SubmissionLimit`, `OpenAt`, `Repetitions`) VALUES
+(1, 'Soumissions illimitées', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une semaine', 7, 0, '2017-14-08 00:00:00', 10),
+(2, 'Cinq soumissions', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une semaine et limité à 5 soumissions', 7, 5, '2017-14-08 00:00:00', 10),
+(3, 'Soumission unique', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont hedbomadaires et uniques', 7, 1, '2017-14-08 00:00:00', 10),
+(4, 'Questionnaire - Travail collectif', 'Description', 'Détails', 7, 0, '2017-14-08 00:00:00', 10);
 
 -- Type 1: Multiple choice (Checkbox)
 -- Type 2: Unique choice (Select)
@@ -273,16 +274,13 @@ INSERT INTO `genericanswer` (`Text`, `idGQ`) VALUES
 ('Communiquer de manière formelle', 11),
 ('Communiquer de manière informelle', 11);
 
-
-
-
 INSERT INTO `groups` (`idG`, `Name`) VALUES
 (1, 'le clan des semi-croustillants');
 
 INSERT INTO `users` (`idU`, `FirstName`, `LastName`, `Email`, `Pass`, `City`, `Age`, `Status`, `Admin`, `idG`) VALUES
 (1, 'Test', 'User', 'test@user.fr', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', '1', 21, NULL, NULL, 1),
-(1, 'Jean-Michel', 'Encadrant', 'admin@email.fr', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', '1', 21, NULL, 1, NULL),
-(2, 'Maxime', 'Dolet', 'maxime.dolet@list.lu', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', 'Belval', 21, 1, 1, 1);
+(2, 'Jean-Michel', 'Encadrant', 'admin@email.fr', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', '1', 21, NULL, 1, NULL),
+(3, 'Maxime', 'Dolet', 'maxime.dolet@list.lu', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', 'Belval', 21, 1, 1, 1);
 
 INSERT INTO `iteration` (`idIT`, `BeginAt`, `idGS`) VALUES
 (1, '2017-14-08 00:00:00', 1),

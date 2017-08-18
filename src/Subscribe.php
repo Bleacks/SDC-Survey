@@ -234,7 +234,7 @@ class Subscribe extends Main
 
 		'.
         // FIXME: Changer le fonctionnement comme pour le changement de mot de passe (recupération du code dans l'URI)
-		parent::getButton('confirmSubscription(\''.$token.'\')')
+		parent::getButton('confirmSubscription()')
 		.'
 		'. $this->getSubscribeConfirmationModal();
 

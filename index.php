@@ -226,8 +226,11 @@ $app->post('/Connect', function (ServerRequestInterface $request, ResponseInterf
 				}
 				else // Deletes eventual existing cookie
 				{
-					$db->deleteConnectionToken($_SESSION['token']);
-					unset($_SESSION['token']);
+                    if ($_SESSION['token'])
+                    {
+                        unset($_SESSION['token']);
+                        $db->deleteConnectionToken($_SESSION['token']);
+                    }
 				}
 				$res = $response->withStatus(200);
 				$_SESSION['email'] = $user->Email;
@@ -589,10 +592,8 @@ $app->post('/Surveys/{survey}', function (ServerRequestInterface $request, Respo
     $res = $response->withStatus(424);
     $document;
 
-    $res = $response->withJson(var_dump($post));
+    //$res = $response->withJson(var_dump($post));
     // TODO: Test with new value with same Text but for different questions
-    // TODO: Refactor DB in order to store personnal answer in another place
-    // TODO: Automatically add new genericAnswer for every new user (group)
 
     foreach ($post as $questionId => $answers)
     {
