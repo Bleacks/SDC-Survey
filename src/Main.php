@@ -30,12 +30,10 @@ class Main
 	* Contains URI, Icon name and Displayed name in Nav Bar */
 	const ACCESSIBLE_PAGES = array(
 		'Connected' => array(
-			0 => array('Home', 'home', 'Accueil'),
-			1 => array('Demo', 'ondemand_video', 'Démonstration'),
-			2 => array('Surveys', 'assignment', 'Questionnaires'),
-			3 => array('Profile', 'account_box', 'Profil'),
-			4 => array('ChangePassword', 'cached', 'Changer le mot de passe'),
-			5 => array('Disconnect', 'launch', 'Déconnexion')
+			0 => array('Surveys', 'assignment', 'Questionnaires'),
+			1 => array('Profile', 'account_box', 'Profil'),
+			2 => array('ChangePassword', 'cached', 'Changer le mot de passe'),
+			3 => array('Disconnect', 'launch', 'Déconnexion')
 		),
 		'Disconnected' => array(
 			0 => array('Connect', 'input', 'Connexion'),

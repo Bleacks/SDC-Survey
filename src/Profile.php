@@ -25,7 +25,7 @@ class Profile extends Main {
 		$content =
 		'
     <h5 id="title"> Bienvenue '.$user->FirstName.' '.$user->LastName.' </h5>
-	<h5 id="title_modify" style="display:none;">Changer les informations de '.$user->FirstName.' '.$user->LastName.'</h5>
+	<h5 id="title_modify" style="display:none;">Modifier les informations de '.$user->FirstName.' '.$user->LastName.'</h5>
 
 	<div class="row">
         <div class="input-field col s12">
@@ -66,11 +66,11 @@ class Profile extends Main {
         </div>
       </div>
 
-	  <button id="modify" class="btn waves-effect waves-light" type="submit" onclick="allowChanges()">Changer les informations
+	  <button id="modify" class="btn waves-effect waves-light" type="submit" onclick="allowChanges()">Modifier les informations
           <i class="material-icons right">send</i>
       </button>
 
-	<button id="password" class="btn waves-effect waves-light right" type="submit" onclick="window.location=\'ChangePassword\'">Modifier le mot de passe
+	<button id="password" class="btn waves-effect waves-light right" type="submit" onclick="window.location=\'ChangePassword\'">Changer le mot de passe
         <i class="material-icons right">send</i>
     </button>
 
