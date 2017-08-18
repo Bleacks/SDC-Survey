@@ -231,7 +231,7 @@ class Database
 	/**
 	* Delete from Recovery table the row associate to the given code
 	* @param varchar $code generate code for the recovery password
-	* @return True if the delete is successfull
+	* @return bool True if the delete is successfull
 	*/
 	public function deleteRecovery($code)
 	{
