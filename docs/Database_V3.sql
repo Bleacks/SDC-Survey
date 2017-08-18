@@ -14,6 +14,7 @@ USE sdc;
 #------------------------------------------------------------
 # Table: GenericSurvey
 #------------------------------------------------------------
+# REMEMBER TO CHANGE THE CONST `FIELDS_LENGTH` IN Database.php ACCORDING TO THESE ONE
 
 CREATE TABLE GenericSurvey(
         idGS            int (11) Auto_increment  NOT NULL ,
@@ -80,9 +81,9 @@ CREATE TABLE Users(
         idU       int (11) Auto_increment  NOT NULL ,
         FirstName Varchar (40) ,
         LastName  Varchar (40) ,
-        Email     Varchar (30) ,
+        Email     Varchar (40) ,
         Pass      Varchar (60) ,
-        City      Varchar (10) ,
+        City      Varchar (40) ,
         Age       Int ,
         Status    Bool ,
         Admin     Bool ,
@@ -180,42 +181,114 @@ ALTER TABLE Answers ADD CONSTRAINT FK_Answers_idGA FOREIGN KEY (idGA) REFERENCES
 #############################################################
 
 INSERT INTO `genericsurvey` (`idGS`, `Title`, `Description`, `More`, `Lifespan`, `SubmissionLimit`) VALUES
-(1, 'Illimité', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une journée', 7, 0),
-(2, 'Cinq', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une journée et limité à 5 soumissions', 7, 5),
-(3, 'Unique', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont quotidienne et uniques', 7, 1);
+(1, 'Soumissions illimitées', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une semaine', 7, 0),
+(2, 'Cinq soumissions', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont gérée par pool d\'une semaine et limité à 5 soumissions', 7, 5),
+(3, 'Soumission unique', 'Compte réinitialisé tous les jours', 'Les réponses associée à ce questionnaire sont hedbomadaires et uniques', 7, 1),
+(4, 'Questionnaire - Travail collectif', 'Description', 'Détails', 7, 0);
 
-INSERT INTO `genericquestion` (`idGQ`, `Text`, `Other`, `Type`, `idGS`) VALUES
-(1, 'Quand avez-vous travaillé ?', 1, 1, 1),
-(2, 'Combien de temps avez-vous travaillé ?', 1, 2, 1),
-(3, 'A quel moment de la journée avez-vous travaillé ?', 0, 1, 1),
-(4, 'Quels outils avez-vous utilisés ?', 1, 3, 1);
+-- Type 1: Multiple choice (Checkbox)
+-- Type 2: Unique choice (Select)
+-- Type 3: Multiple choice (Chips)
+-- Type 4: Unique choice (Radio)
+-- Type 5: Group question (checkbox for each member of group)
+-- Type 6: Text input
 
-INSERT INTO `genericanswer` (`idGA`, `Text`, `idGQ`) VALUES
-(1, 'Matin', 1),
-(2, 'Midi', 1),
-(3, 'Soir', 1),
-(4, 'Nuit', 1),
-(5, 'Une heure', 2),
-(6, 'Deux heures', 2),
-(7, 'Matin', 3),
-(8, 'Après-midi', 3),
-(9, 'Soir', 3),
-(10, 'Lumion', 4),
-(11, 'Dropbox', 4),
-(12, 'Illustrator', 4),
-(13, 'Téléphone', 4),
-(14, 'PowerPoint', 4),
-(15, 'Skype', 4);
+INSERT INTO `genericquestion` (`Text`, `Other`, `Type`, `idGS`, `Required`) VALUES
+('Quand avez-vous travaillé ?', 1, 1, 1, 0),
+('Combien de temps avez-vous travaillé ?', 1, 2, 1, 0),
+('A quel moment de la journée avez-vous travaillé ?', 0, 1, 1, 0),
+('Quels outils avez-vous utilisés ?', 1, 3, 1, 1),
+
+('A quel moment de la journée avez-vous travaillé ?', 0, 1, 4, 1),
+('Quels outils avez-vous utilisés ?', 1, 3, 4, 1),
+('Quel était le mode de travail ?', 0, 5, 4, 1),
+('Quelle était le type d\'activité ?', 0, 4, 4, 1),
+('Combien de temps avez-vous travaillé ?', 0, 4, 4, 1),
+('Focus', 0, 6, 4, 0), -- // TODO: Ajouter la prise en charge du focus (document)
+('Quelle à été l\'action prioritaire ?', 0, 2, 4, 1);
+
+INSERT INTO `genericanswer` (`Text`, `idGQ`) VALUES
+('Matin', 1),
+('Midi', 1),
+('Soir', 1),
+('Nuit', 1),
+('Une heure', 2),
+('Deux heures', 2),
+('Matin', 3),
+('Après-midi', 3),
+('Soir', 3),
+
+('Matin', 5),
+('Après-midi', 5),
+('Soir', 5),
+
+('ArchiCAD', 6),
+('Artlantis', 6),
+('AutoCAD', 6),
+('Dropbox', 6),
+('Excel', 6),
+('Face à face', 6),
+('Facebook', 6),
+('Framatalk', 6),
+('Google drive', 6),
+('Grasshopper-Rhinoceros', 6),
+('InDesign', 6),
+('Illustrator', 6),
+('Kanbanchi', 6),
+('Lumion', 6),
+('Messenger', 6),
+('Mycloud', 6),
+('Papier-crayon', 6),
+('Photoshop', 6),
+('PowerPoint', 6),
+('Revit', 6),
+('Rhinoceros', 6),
+('Sketchboard', 6),
+('SketchUp', 6),
+('SketSha', 6),
+('Skype', 6),
+('Teambition', 6),
+('Téléphone', 6),
+('Word', 6),
+
+('Individuel', 7),
+
+('Collaboration', 8),
+('Coopération', 8),
+('Voir avec G', 8),
+('Voir avec G.G', 8),
+
+-- // TODO: Ajouter les conversions lors de l'exportation
+('Quelques minutes', 9),
+('Envrion 30\'', 9),
+('Environ 60\'', 9),
+('Quelques heures', 9),
+('Une journée', 9),
+('Une demi journée', 9),
+
+('Se coordonner sur les tâches à faire', 11),
+('Se coordonner sur les tâches à suivre', 11),
+('Formaliser une idée en cours', 11),
+('Produire un document final', 11),
+('Communiquer de manière formelle', 11),
+('Communiquer de manière informelle', 11);
+
+
+
+
+INSERT INTO `groups` (`idG`, `Name`) VALUES
+(1, 'le clan des semi-croustillants');
 
 INSERT INTO `users` (`idU`, `FirstName`, `LastName`, `Email`, `Pass`, `City`, `Age`, `Status`, `Admin`, `idG`) VALUES
-(1, 'Test', 'User', 'test@user.fr', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', '1', 21, NULL, NULL, NULL),
-(2, 'Maxime', 'Dolet', 'maxime.dolet@list.lu', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', 'Belval', 21, 1, 1, NULL);
+(1, 'Test', 'User', 'test@user.fr', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', '1', 21, NULL, NULL, 1),
+(1, 'Jean-Michel', 'Encadrant', 'admin@email.fr', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', '1', 21, NULL, 1, NULL),
+(2, 'Maxime', 'Dolet', 'maxime.dolet@list.lu', '$2y$10$/P91ociOc1taPWk1DC7gReqxXTPTGIt6iM9w3M.yuJne8kvtBJgp6', 'Belval', 21, 1, 1, 1);
 
 INSERT INTO `iteration` (`idIT`, `BeginAt`, `idGS`) VALUES
-(1, '2017-08-03 00:00:00', 1),
-(2, '2017-08-03 00:00:00', 2),
-(3, '2017-08-03 00:00:00', 3),
-(4, '2017-07-03 00:00:00', 2);
+(1, '2017-14-08 00:00:00', 1),
+(2, '2017-14-08 00:00:00', 2),
+(3, '2017-14-08 00:00:00', 3),
+(4, '2017-14-08 00:00:00', 2);
 
 INSERT INTO `survey` (`idS`, `StartedAt`, `FinishedAt`, `Document`, `idU`, `idIT`) VALUES
 (1, '2017-08-03 11:00:00', '2017-08-03 12:00:00', 'Le document', 1, 1),

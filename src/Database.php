@@ -36,6 +36,31 @@ class Database
 	/** Length in days for a connection token to perish if not used */
 	const CONNECT_TOKEN_EXPIRATION_LENGTH = 7;
 
+	/** Informations about fields length in the Database */
+    const FIELDS_LENGTH = array(
+        'GenericSurvey'         => array(
+            'Titre'         => 100,
+            'Description'   => 100,
+            'More'          => 250
+        ),
+        'GenericQuestion'       => array(
+            'Text'          => 100
+        ),
+        'GenericAnswer'         => array(
+            'Text'          => 50
+        ),
+        'Survey'                => array(
+            'Document'      => 200
+        ),
+        'Users'                 => array(
+            'FirstName'     => 40,
+            'LastName'      => 40,
+            'Email'         => 40,
+            'Pass'          => 60,
+            'City'          => 40
+        )
+    );
+
 	/**
 	* Private constructor of the Database connector
 	* Initializes ORM parameters and id names override
@@ -51,17 +76,16 @@ class Database
 		// Overrides id for any table that has PK different from 'id'
 		ORM::configure('id_column_overrides', array(
 			'Users'				=> 'idU',
-			'Question'			=> 'idQ',
-			'Answer'			=> 'idA',
-			'AnsweredSurvey'	=> array('idS', 'idU'),
-			'OtherSurvey'		=> array('idQ', 'idU'),
-			'Users'				=> 'idU',
-			'PendingSub'		=> 'idPS',
 			'Groups'			=> 'idG',
-			'Token'				=> 'idT',
 			'Recovery'			=> 'Code',
+			'Token'				=> 'idT',
+			'Answers'			=> array('idGQ', 'idS', 'idGA'),
+			'Survey'			=> 'idS',
 			'Iteration'			=> 'idIT',
-			'GenericSurvey'		=> 'idGS'
+			'PendingSub'		=> 'idPS',
+			'GenericSurvey'		=> 'idGS',
+			'GenericQuestion'	=> 'idGQ',
+			'GenericAnswer'		=> 'idGA'
 		));
 	}
 
@@ -375,5 +399,122 @@ class Database
 	public function getAllAnswers($questionId)
 	{
 		return ORM::forTable('GenericAnswer')->where('idGQ', $questionId)->findMany();
+	}
+
+	/**
+	* Retrieves the Generic Survey associated to the given idGS
+	* @param $idGS int Database id of the GenericSurvey
+	* @return Object(ORM) GenericSurvey
+	*/
+	public function findGenericSurvey($idGS)
+	{
+		return ORM::forTable('GenericSurvey')->findOne($idGS);
+	}
+
+	/**
+	* Retrieves the GenericQuestion associated to the given idGQ
+	* @param $idGQ int Database id of the GenericQuestion
+	* @return Object(ORM) GenericQuestion
+	*/
+	public function findGenericQuestion($idGQ)
+	{
+		return ORM::forTable('GenericQuestion')->findOne($idGQ);
+	}
+
+	/**
+	* Retrieves the current iteration for the given idGS
+	* @param $idGS int Database id of the GenericSurvey
+	* @return Object(ORM) current iteration for the given survey
+	*/
+	public function findCurrentIteration($genericSurvey)
+	{
+		return ORM::forTable('Iteration')->where('idGS', $genericSurvey->idGS)
+		->having_raw('DATEDIFF(NOW(), Iteration.BeginAt) < ?', array($genericSurvey->Lifespan))
+		->findOne();
+	}
+
+	/**
+	* Create a new answer associated to the given Survey, GenericQuestion and GenericAnswer
+	* @param $idGQ int Database id of GenericQuestion
+	* @param $idS int Database id of Survey
+	* @param $idGA int Database id of GenericAnswer
+	*/
+	public function createAnswer($idGQ, $idS, $idGA)
+	{
+		$answer = ORM::forTable('Answers')->create();
+		$answer->idGQ = $idGQ;
+		$answer->idS = $idS;
+		$answer->idGA = $idGA;
+		return $answer->save();
+	}
+
+	/**
+	* Creates (or find) a GenericAnswer with the given text associated to the given GenericQuestion
+	* @param $idGQ int Database id of GenericQuestion
+	* @param $text string Displayed answer in the form
+	* @return Object(ORM) GenericAnswer created or found
+	*/
+	public function createGenericAnswer($idGQ, $text)
+	{
+		$genericAnswer = ORM::forTable('GenericAnswer')->where('idGQ', $idGQ)->where('Text', $text)->findOne();
+		if (!$genericAnswer)
+		{
+			$genericAnswer = ORM::forTable('GenericAnswer')->create();
+			$genericAnswer->idGQ = $idGQ;
+			$genericAnswer->Text = $text;
+			$genericAnswer->save();
+		}
+		return $genericAnswer;
+	}
+
+	/**
+	* Retrieves a GenericAnswer using the given text and type
+	* @param $answer Object(ORM) GenericAnswer idGA or Text
+	* @param $question int idGQ of the associated GenericQuestion
+	* @return Object(ORM) GenericAnswer with the given parameters
+	*/
+	public function findGenericAnswer($answer, $question = 0)
+	{
+		$genericAnswer = false;
+		if (intval($answer))
+		{
+			// TODO: Ajouter filtre question
+			$genericAnswer = ORM::forTable('GenericAnswer')->findOne($answer);
+		} else
+		{
+			if ($question != 0)
+				$genericAnswer = ORM::forTable('GenericAnswer')->where('idGQ', $question)->where('Text', $answer)->findOne();
+			else
+				$genericAnswer = ORM::forTable('GenericAnswer')->where('Text', $answer)->findOne();
+		}
+		return $genericAnswer;
+	}
+
+	/**
+	* Creates an empty survey and initializes his id
+	* @return Object(ORM) Survey created
+	*/
+	public function createEmptySurvey()
+	{
+		$survey = ORM::forTable('Survey')->create();
+		$survey->save();
+		return $survey;
+	}
+
+	/**
+	* Updates the given Survey with the given informations
+	* @param $survey Object(ORM) Survey we want to update
+	* @param $document string Document field of the Survey
+	* @param $idU int Database id of the associated user
+	* @param $idIT int Database id of the associated Iteration
+	* @return bool True if insert is successfull
+	*/
+	public function submitSurvey($survey, $document, $idU, $idIT)
+	{
+		$survey->set_expr('FinishedAt', 'NOW()');
+		$survey->idU = $idU;
+		$survey->idIT = $idIT;
+		$survey->document = $document;
+		return $survey->save();
 	}
 }
