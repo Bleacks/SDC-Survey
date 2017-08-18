@@ -39,7 +39,8 @@ class Connect extends Main {
 				<div class="input-field col s12">
 					<input id="password" type="password" class="required valid" value="azer1">
 					<label for="password"><p class="required_flag">*</p> Password</label>
-				</div>'./*
+				</div>
+				<a href="Recovery"> Mot de passe oublié? </a>'./*
 				<p class="col s12">
 					<input id="remember" name="remember" type="checkbox" checked="checked" class="filled-in">
 					<label for="remember">Se souvenir de moi</label>
