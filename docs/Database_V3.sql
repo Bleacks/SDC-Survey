@@ -296,3 +296,14 @@ INSERT INTO `survey` (`idS`, `StartedAt`, `FinishedAt`, `Document`, `idU`, `idIT
 (5, '2017-08-03 11:00:00', '2017-08-03 12:00:00', 'Le document', 1, 4),
 (6, '2017-08-03 11:00:00', '2017-08-03 12:00:00', 'Le document', 1, 2),
 (7, '2017-08-03 11:00:00', '2017-08-03 12:00:00', 'Le document', 1, 3);
+
+
+
+CREATE TRIGGER after_insert_genericSurvey AFTER INSERT
+ON GenericSurvey FOR EACH ROW 
+BEGIN
+    WHILE NEW.Repetitions > 0 DO
+        INSERT INTO Iteration (BeginAt, idGS) VALUES (DATEADD(day, NEW.Lifespan, NEW.OpenAt), NEW.IdGS);
+        NEW.Repetition - 1;
+    END WHILE;
+END
